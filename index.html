@@ -3,7 +3,10 @@
 <head>
 <title>MEGATRON Cyber Intelligence Command Center</title>
 
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+
 <style>
+
 body{
 background:#050b18;
 color:#00eaff;
@@ -24,6 +27,13 @@ color:#aaa;
 margin-top:-10px;
 }
 
+.alertbar{
+background:#111;
+color:#ff4444;
+padding:10px;
+font-weight:bold;
+}
+
 .section{
 margin-top:40px;
 }
@@ -38,25 +48,69 @@ width:250px;
 box-shadow:0 0 10px #00eaff33;
 }
 
-.attackmap{
-margin-top:40px;
-}
-
 iframe{
 border:none;
 width:90%;
 height:500px;
 border-radius:10px;
+margin-top:20px;
 }
+
+.counter{
+font-size:60px;
+color:#ff4444;
+margin-top:20px;
+}
+
+.mapoverlay{
+background:url("https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg");
+background-size:cover;
+height:300px;
+opacity:0.2;
+margin-top:30px;
+}
+
+.feedbox{
+background:#0f1b2e;
+padding:20px;
+border-radius:10px;
+width:400px;
+margin:auto;
+margin-top:40px;
+text-align:left;
+}
+
+#networkGraph{
+height:450px;
+background:#091423;
+width:90%;
+margin:auto;
+border-radius:10px;
+}
+
 </style>
 </head>
 
 <body>
 
+<div class="alertbar">
+<marquee>
+SOC ALERT: Botnet activity detected | Phishing campaign targeting Asia | Suspicious crypto wallet cluster | Malware C2 server detected
+</marquee>
+</div>
+
 <header>
 MEGATRON CYBER COMMAND CENTER
-<div class="sub">Cyber Intelligence & Digital Forensics Lab</div>
+<div class="sub">Cyber Intelligence, Threat Analytics & Digital Forensics Lab</div>
 </header>
+
+<h2>Global Cyber Attack Counter</h2>
+
+<div class="counter" id="attackCounter">15432</div>
+
+<p>Estimated cyber attacks detected worldwide</p>
+
+<div class="mapoverlay"></div>
 
 <div class="section">
 
@@ -82,21 +136,21 @@ MEGATRON CYBER COMMAND CENTER
 
 </div>
 
-<div class="attackmap">
-
 <h2>Live Global Cyber Attack Map</h2>
 
 <iframe src="https://cybermap.kaspersky.com/en/widget/dynamic/dark"></iframe>
 
-</div>
-<!-- CYBER ANALYTICS DASHBOARD -->
+<h2>Live DDoS Threat Map</h2>
+
+<iframe src="https://livethreatmap.radware.com/"></iframe>
+
+<!-- CYBER ANALYTICS -->
 
 <div style="display:flex;justify-content:center;gap:30px;margin-top:50px;flex-wrap:wrap">
 
 <div style="background:#0f1b2e;padding:25px;border-radius:10px;width:280px">
 <h3>Malaysia Threat Monitor</h3>
-<p>Real-time cyber threat activity affecting Malaysia.</p>
-<ul style="text-align:left">
+<ul>
 <li>Top Attack Source: China</li>
 <li>Malware Activity: Medium</li>
 <li>Phishing Campaigns: 14 active</li>
@@ -106,7 +160,6 @@ MEGATRON CYBER COMMAND CENTER
 
 <div style="background:#0f1b2e;padding:25px;border-radius:10px;width:280px">
 <h3>Digital Forensics Demo</h3>
-<p>Interactive investigation prototype.</p>
 
 <button onclick="openCase()" style="padding:10px 20px;background:#1e90ff;border:none;border-radius:6px;color:white">
 Open Investigation Case
@@ -116,31 +169,101 @@ Open Investigation Case
 
 <div style="background:#0f1b2e;padding:25px;border-radius:10px;width:280px">
 <h3>AI Threat Analytics</h3>
-<p>Machine learning anomaly detection.</p>
 
-<ul style="text-align:left">
+<ul>
 <li>Risk Score Engine</li>
 <li>Financial Pattern Detection</li>
 <li>Crypto Transaction Analysis</li>
 <li>Network Graph Intelligence</li>
+<li>Procurement Fraud Detection</li>
 </ul>
 
 </div>
 
 </div>
 
+<!-- MALICIOUS IP FEED -->
+
+<div class="feedbox">
+
+<h3>Live Malicious IP Feed</h3>
+
+<ul>
+<li>185.220.101.32 – Botnet Node</li>
+<li>91.219.236.45 – Malware Distribution</li>
+<li>103.27.124.11 – Phishing Server</li>
+<li>176.119.1.122 – Command & Control</li>
+<li>45.155.205.233 – Crypto Scam Infrastructure</li>
+</ul>
+
+</div>
+
+<!-- PROCUREMENT NETWORK -->
+
+<h2 style="margin-top:60px">Procurement Intelligence Network</h2>
+
+<p>Visual analysis of contractor, shell companies and financial links.</p>
+
+<div id="networkGraph"></div>
+
+<button onclick="loadGraph()" style="margin-top:20px;padding:10px 20px;background:#ff9800;border:none;border-radius:6px;color:white">
+Analyze Network
+</button>
+
 <script>
 
 function openCase(){
 
-alert("Investigation Demo\n\nCase: Financial Crime Network\nLocation: Kuala Lumpur\n\nEntities:\n- Shell Company\n- Contractor Network\n- Crypto Wallet\n\nAnalysis modules activated.")
+alert("Investigation Demo\n\nCase: Financial Crime Network\nLocation: Kuala Lumpur\n\nEntities:\n- Shell Company\n- Contractor Network\n- Crypto Wallet")
 
 }
 
+function loadGraph(){
+
+var nodes = new vis.DataSet([
+{id:1,label:"Contractor A",color:"#00eaff"},
+{id:2,label:"Shell Company",color:"#ff4444"},
+{id:3,label:"Crypto Wallet",color:"#ffaa00"},
+{id:4,label:"Suspicious IP",color:"#ff4444"},
+{id:5,label:"Vendor Network",color:"#00ff99"}
+]);
+
+var edges = new vis.DataSet([
+{from:1,to:2},
+{from:2,to:3},
+{from:3,to:4},
+{from:2,to:5}
+]);
+
+var container=document.getElementById("networkGraph");
+
+var data={nodes:nodes,edges:edges};
+
+var options={
+nodes:{font:{color:"#ffffff"}},
+edges:{color:"#00eaff"},
+physics:{enabled:true}
+};
+
+new vis.Network(container,data,options);
+
+}
+
+/* ATTACK COUNTER */
+
+let attacks=15432;
+
+setInterval(function(){
+attacks += Math.floor(Math.random()*10);
+document.getElementById("attackCounter").innerText=attacks;
+},2000);
+
 </script>
-</body>
-</html>
+
 <footer style="text-align:center;color:#6b7a90;margin-top:40px;padding:20px;">
 Megatron Cyber Intelligence Lab © 2026<br>
 Designed & Built by Muhammad Asri bin Harun
 </footer>
+
+</body>
+</html>
