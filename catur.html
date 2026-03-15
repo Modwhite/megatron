@@ -26,7 +26,7 @@
         }
 
         header {
-            font-size: clamp(20px, 6vw, 28px);
+            font-size: clamp(18px, 6vw, 26px);
             font-weight: bold;
             color: var(--neon-cyan);
             letter-spacing: 3px;
@@ -40,27 +40,19 @@
             background: var(--card-bg);
             border: 2px solid #1e3a5f;
             border-radius: 12px;
-            padding: 40px 20px;
+            padding: 45px 20px;
             width: 100%;
-            max-width: 500px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+            max-width: 450px;
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
             position: relative;
             overflow: hidden;
-        }
-
-        .terminal-container::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 30px;
-            background: #16253d;
-            border-bottom: 1px solid #1e3a5f;
+            border: 1px solid var(--neon-cyan);
         }
 
         /* Dot hiasan ala window terminal */
         .dots {
             position: absolute;
-            top: 10px;
+            top: 12px;
             left: 15px;
             display: flex;
             gap: 6px;
@@ -71,26 +63,27 @@
         .green { background: #27c93f; }
 
         .icon-box {
-            margin: 20px 0;
+            margin: 10px 0 25px 0;
         }
 
         .icon-box img {
             width: 100px;
-            filter: drop-shadow(0 0 10px var(--neon-cyan));
+            filter: drop-shadow(0 0 15px var(--neon-cyan));
         }
 
         h2 {
             font-size: 18px;
             color: var(--neon-cyan);
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
         }
 
         p {
             font-size: 14px;
             color: #8a99af;
             line-height: 1.6;
-            margin-bottom: 30px;
-            padding: 0 20px;
+            margin-bottom: 35px;
+            padding: 0 10px;
         }
 
         /* Button Launch */
@@ -98,38 +91,44 @@
             display: inline-block;
             background: var(--neon-cyan);
             color: #050b18;
-            padding: 15px 30px;
-            border-radius: 6px;
+            padding: 16px 32px;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.3s ease;
             box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            font-size: 16px;
         }
 
         .btn-launch:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px var(--neon-cyan);
+            transform: translateY(-3px);
+            box-shadow: 0 0 35px var(--neon-cyan);
+            background: #ffffff;
         }
 
         .btn-back {
-            margin-top: 30px;
+            margin-top: 40px;
             color: #556a89;
             text-decoration: none;
             font-size: 14px;
             transition: 0.3s;
+            border-bottom: 1px solid transparent;
         }
 
         .btn-back:hover {
             color: var(--neon-cyan);
+            border-bottom: 1px solid var(--neon-cyan);
         }
 
         .status-line {
             font-family: 'Courier New', Courier, monospace;
-            font-size: 12px;
+            font-size: 11px;
             color: #39ff14;
-            margin-top: 20px;
+            margin-top: 25px;
+            text-align: center;
+            opacity: 0.8;
         }
     </style>
 </head>
@@ -145,23 +144,22 @@
         </div>
 
         <div class="icon-box">
-            <img src="https://cdn-icons-png.flaticon.com/512/3039/3039426.png" alt="Chess Icon">
+            <img src="https://cdn-icons-png.flaticon.com/512/3039/3039426.png" alt="Tactical Icon">
         </div>
 
         <h2>EXTERNAL ENGINE REQUIRED</h2>
         <p>
-            Untuk simulasi taktikal yang stabil (Castling, Checkmate & Stockfish AI), 
-            sila lancarkan terminal simulasi melalui pautan selamat Lichess Open Source.
+            Sila lancarkan <strong>Tactical Engine Terminal</strong> untuk simulasi penuh antarabangsa termasuk Castling, Checkmate & Stockfish AI Analysis.
         </p>
 
-        <a href="https://lichess.org/setup/ai" target="_blank" class="btn-launch">
+        <a href="https://lichess.org/play" target="_blank" class="btn-launch">
             LAUNCH TERMINAL →
         </a>
 
         <div class="status-line">
-            > Connection: SECURE<br>
-            > Engine: STOCKFISH v16<br>
-            > Status: READY_TO_DEPLOY
+            [ SYSTEM: SECURE ]<br>
+            [ ENGINE: LICHESS_LILA_STABLE ]<br>
+            [ STATUS: READY_TO_DEPLOY ]
         </div>
     </div>
 
