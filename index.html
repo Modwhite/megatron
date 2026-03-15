@@ -1,141 +1,161 @@
 <!DOCTYPE html>
-<html>
+<html lang="ms">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MEGATRON Cyber Intelligence Command Center</title>
 
 <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
 
 <style>
-
-body{
-background:#050b18;
-color:#00eaff;
-font-family:Arial;
-text-align:center;
-margin:0;
+body {
+    background: #050b18;
+    color: #00eaff;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Elak scroll ke tepi */
 }
 
-header{
-padding:40px;
-font-size:40px;
-font-weight:bold;
-letter-spacing:3px;
+header {
+    padding: 20px;
+    font-size: clamp(24px, 5vw, 40px); /* Font melaras ikut saiz skrin */
+    font-weight: bold;
+    letter-spacing: 2px;
 }
 
-.sub{
-color:#aaa;
-margin-top:-10px;
+.sub {
+    color: #aaa;
+    margin-top: -5px;
+    font-size: clamp(12px, 3vw, 16px);
+    padding: 0 10px;
 }
 
-.alertbar{
-background:#111;
-color:#ff4444;
-padding:10px;
-font-weight:bold;
+.alertbar {
+    background: #111;
+    color: #ff4444;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 14px;
 }
 
-.section{
-margin-top:40px;
-display: flex;
-justify-content: center;
-flex-wrap: wrap;
+.section {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; /* Susun kad ke bawah jika skrin sempit */
+    gap: 15px;
+    padding: 10px;
 }
 
-/* KEMASKINI GAYA KAD (STEP 1) */
-.card{
-display:inline-block;
-background:#0d1a2b;
-padding:20px;
-margin:20px;
-border-radius:10px;
-width:250px;
-box-shadow:0 0 10px #00eaff33;
-cursor: pointer;
-transition: 0.3s ease;
-border: 1px solid transparent;
+.card {
+    background: #0d1a2b;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%; /* Default 100% untuk phone */
+    max-width: 280px; /* Lebar maksimum untuk desktop */
+    box-shadow: 0 0 10px #00eaff33;
+    cursor: pointer;
+    transition: 0.3s ease;
+    border: 1px solid transparent;
+    box-sizing: border-box;
 }
 
 .card:hover {
-    transform: translateY(-10px);
+    transform: translateY(-5px);
     border: 1px solid #00eaff;
     box-shadow: 0 0 25px #00eaff66;
 }
 
-iframe{
-border:none;
-width:90%;
-height:500px;
-border-radius:10px;
-margin-top:20px;
+iframe {
+    border: none;
+    width: 95%; /* Guna peratus supaya melaras ikut phone */
+    height: 300px; /* Pendek sikit untuk phone */
+    border-radius: 10px;
+    margin-top: 20px;
 }
 
-.counter{
-font-size:60px;
-color:#ff4444;
-margin-top:20px;
+/* Untuk skrin besar (Desktop) */
+@media (min-width: 768px) {
+    iframe { height: 500px; }
 }
 
-.mapoverlay{
-background:url("https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg");
-background-size:cover;
-height:300px;
-opacity:0.2;
-margin-top:30px;
+.counter {
+    font-size: clamp(40px, 10vw, 60px);
+    color: #ff4444;
+    margin-top: 10px;
 }
 
-.feedbox{
-background:#0f1b2e;
-padding:20px;
-border-radius:10px;
-width:400px;
-margin:auto;
-margin-top:40px;
-text-align:left;
+.mapoverlay {
+    background: url("https://upload.wikimedia.org/wikipedia/commons/8/80/World_map_-_low_resolution.svg");
+    background-size: cover;
+    height: 200px;
+    opacity: 0.2;
+    margin-top: 20px;
 }
 
-#networkGraph{
-height:450px;
-background:#091423;
-width:90%;
-margin:auto;
-border-radius:10px;
+.feedbox {
+    background: #0f1b2e;
+    padding: 20px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 450px;
+    margin: 40px auto;
+    text-align: left;
 }
 
-/* GAYA BUTANG CATUR SIBER */
-.btn-cyber{
-display:inline-block;
-margin-top:20px;
-padding:15px 35px;
-border:2px solid #00eaff;
-background:#0d1a2b;
-color:#00eaff;
-text-decoration:none;
-font-size:18px;
-font-weight:bold;
-border-radius:5px;
-text-transform:uppercase;
-letter-spacing:2px;
-box-shadow:0 0 15px #00eaff66;
-transition:0.3s;
-cursor: pointer;
+#networkGraph {
+    height: 350px;
+    background: #091423;
+    width: 95%;
+    margin: auto;
+    border-radius: 10px;
 }
 
-.btn-cyber:hover{
-background:#00eaff;
-color:#050b18;
-box-shadow:0 0 25px #00eaff;
+.btn-cyber {
+    display: inline-block;
+    margin: 20px 10px;
+    padding: 12px 25px;
+    border: 2px solid #00eaff;
+    background: #0d1a2b;
+    color: #00eaff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 5px;
+    text-transform: uppercase;
+    transition: 0.3s;
 }
 
-/* GAYA BUTANG KHAS UNTUK PAGES (STEP 1 ADD-ON) */
-.btn-forensics { 
-    padding:10px 20px; background:#1e90ff; border:none; border-radius:6px; color:white; cursor:pointer; font-weight: bold; transition: 0.3s;
+.btn-cyber:hover {
+    background: #00eaff;
+    color: #050b18;
 }
-.btn-forensics:hover { background:#00bfff; box-shadow: 0 0 15px #1e90ff; }
 
-.btn-analyze { 
-    margin-top:20px; padding:10px 20px; background:#ff9800; border:none; border-radius:6px; color:white; cursor:pointer; font-weight: bold; transition: 0.3s;
+/* Gaya Butang Khas */
+.btn-forensics { background: #1e90ff; border: none; padding: 10px 20px; border-radius: 6px; color: white; cursor: pointer; }
+.btn-analyze { margin-top: 15px; padding: 10px 20px; background: #ff9800; border: none; border-radius: 6px; color: white; cursor: pointer; }
+
+/* Flexbox untuk box bawah supaya responsif */
+.flex-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    padding: 10px;
 }
-.btn-analyze:hover { background:#ffb74d; box-shadow: 0 0 15px #ff9800; }
+
+.info-box {
+    background: #0f1b2e;
+    padding: 20px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 300px;
+    text-align: left;
+    box-sizing: border-box;
+}
 
 </style>
 </head>
@@ -143,14 +163,12 @@ box-shadow:0 0 25px #00eaff;
 <body>
 
 <div class="alertbar">
-<marquee>
-SOC ALERT: Botnet activity detected | Phishing campaign targeting Asia | Suspicious crypto wallet cluster | Malware C2 server detected
-</marquee>
+    <marquee>SOC ALERT: Botnet activity detected | Phishing campaign targeting Asia | Suspicious crypto wallet cluster</marquee>
 </div>
 
 <header>
-MEGATRON CYBER COMMAND CENTER
-<div class="sub">Cyber Intelligence, Threat Analytics & Digital Forensics Lab</div>
+    MEGATRON CYBER COMMAND CENTER
+    <div class="sub">Cyber Intelligence, Threat Analytics & Digital Forensics Lab</div>
 </header>
 
 <div>
@@ -164,133 +182,106 @@ MEGATRON CYBER COMMAND CENTER
 <div class="mapoverlay"></div>
 
 <div class="section">
-
-<div class="card" onclick="document.getElementById('live-map').scrollIntoView({behavior: 'smooth'})">
-<h3>Threat Monitoring</h3>
-<p>Real-time global cyber attack monitoring.</p>
-</div>
-
-<div class="card" onclick="location.href='digital_forensics.html'">
-<h3>Digital Forensics</h3>
-<p>Evidence analysis and cyber investigation tools.</p>
-</div>
-
-<div class="card" onclick="location.href='financial_crime.html'">
-<h3>Crypto Tracing</h3>
-<p>Track suspicious blockchain transactions.</p>
-</div>
-
-<div class="card" onclick="location.href='financial_crime.html'">
-<h3>Network Analysis</h3>
-<p>Investigate criminal financial networks.</p>
-</div>
-
+    <div class="card" onclick="document.getElementById('live-map').scrollIntoView({behavior: 'smooth'})">
+        <h3>Threat Monitoring</h3>
+        <p>Real-time global cyber attack monitoring.</p>
+    </div>
+    <div class="card" onclick="location.href='digital_forensics.html'">
+        <h3>Digital Forensics</h3>
+        <p>Evidence analysis and cyber investigation tools.</p>
+    </div>
+    <div class="card" onclick="location.href='financial_crime.html'">
+        <h3>Crypto Tracing</h3>
+        <p>Track suspicious blockchain transactions.</p>
+    </div>
+    <div class="card" onclick="location.href='financial_crime.html'">
+        <h3>Network Analysis</h3>
+        <p>Investigate criminal financial networks.</p>
+    </div>
 </div>
 
 <h2 id="live-map">Live Global Cyber Attack Map</h2>
 <iframe src="https://cybermap.kaspersky.com/en/widget/dynamic/dark"></iframe>
 
-<h2>Live DDoS Threat Map</h2>
-<iframe src="https://livethreatmap.radware.com/"></iframe>
+<div class="flex-container">
+    <div class="info-box">
+        <h3>Malaysia Threat Monitor</h3>
+        <ul style="padding-left: 20px;">
+            <li>Top Attack Source: China</li>
+            <li>Malware Activity: Medium</li>
+            <li>Phishing Campaigns: 14 active</li>
+            <li>Suspicious IPs: 63</li>
+        </ul>
+    </div>
 
-<div style="display:flex;justify-content:center;gap:30px;margin-top:50px;flex-wrap:wrap">
+    <div class="info-box" style="text-align:center;">
+        <h3>Digital Forensics Demo</h3>
+        <button class="btn-forensics" onclick="location.href='digital_forensics.html'">
+            Open Investigation Case
+        </button>
+    </div>
 
-<div style="background:#0f1b2e;padding:25px;border-radius:10px;width:280px">
-<h3>Malaysia Threat Monitor</h3>
-<ul>
-<li>Top Attack Source: China</li>
-<li>Malware Activity: Medium</li>
-<li>Phishing Campaigns: 14 active</li>
-<li>Suspicious IPs: 63</li>
-</ul>
-</div>
-
-<div style="background:#0f1b2e;padding:25px;border-radius:10px;width:280px">
-<h3>Digital Forensics Demo</h3>
-<button class="btn-forensics" onclick="location.href='digital_forensics.html'">
-Open Investigation Case
-</button>
-</div>
-
-<div style="background:#0f1b2e;padding:25px;border-radius:10px;width:280px">
-<h3>AI Threat Analytics</h3>
-<ul>
-<li>Risk Score Engine</li>
-<li>Financial Pattern Detection</li>
-<li>Crypto Transaction Analysis</li>
-<li>Network Graph Intelligence</li>
-<li>Procurement Fraud Detection</li>
-</ul>
-</div>
-
+    <div class="info-box">
+        <h3>AI Threat Analytics</h3>
+        <ul style="padding-left: 20px;">
+            <li>Risk Score Engine</li>
+            <li>Financial Pattern Detection</li>
+            <li>Crypto Transaction Analysis</li>
+            <li>Network Graph Intelligence</li>
+        </ul>
+    </div>
 </div>
 
 <div class="feedbox">
-<h3>Live Malicious IP Feed</h3>
-<ul>
-<li>185.220.101.32 – Botnet Node</li>
-<li>91.219.236.45 – Malware Distribution</li>
-<li>103.27.124.11 – Phishing Server</li>
-<li>176.119.1.122 – Command & Control</li>
-<li>45.155.205.233 – Crypto Scam Infrastructure</li>
-</ul>
+    <h3>Live Malicious IP Feed</h3>
+    <ul style="padding-left: 20px; font-family: monospace; font-size: 13px;">
+        <li>185.220.101.32 – Botnet Node</li>
+        <li>91.219.236.45 – Malware Distribution</li>
+        <li>103.27.124.11 – Phishing Server</li>
+        <li>176.119.1.122 – C&C Server</li>
+    </ul>
 </div>
 
-<h2 style="margin-top:60px">Procurement Intelligence Network</h2>
-<p>Visual analysis of contractor, shell companies and financial links.</p>
+<h2 style="margin-top:40px">Procurement Intelligence Network</h2>
+<p style="padding:0 20px;">Visual analysis of contractor, shell companies and financial links.</p>
 
 <div id="networkGraph"></div>
-
-<button class="btn-analyze" onclick="location.href='financial_crime.html'">
-Analyze Network
-</button>
+<button class="btn-analyze" onclick="location.href='financial_crime.html'">Analyze Network</button>
 
 <script>
-// Fungsi asal anda dikekalkan
-function openCase(){
-alert("Investigation Demo\n\nCase: Financial Crime Network\nLocation: Kuala Lumpur\n\nEntities:\n- Shell Company\n- Contractor Network\n- Crypto Wallet")
-}
-
 function loadGraph(){
-var nodes = new vis.DataSet([
-{id:1,label:"Contractor A",color:"#00eaff"},
-{id:2,label:"Shell Company",color:"#ff4444"},
-{id:3,label:"Crypto Wallet",color:"#ffaa00"},
-{id:4,label:"Suspicious IP",color:"#ff4444"},
-{id:5,label:"Vendor Network",color:"#00ff99"}
-]);
-
-var edges = new vis.DataSet([
-{from:1,to:2},
-{from:2,to:3},
-{from:3,to:4},
-{from:2,to:5}
-]);
-
-var container=document.getElementById("networkGraph");
-var data={nodes:nodes,edges:edges};
-var options={
-nodes:{font:{color:"#ffffff"}},
-edges:{color:"#00eaff"},
-physics:{enabled:true}
-};
-new vis.Network(container,data,options);
+    var nodes = new vis.DataSet([
+        {id:1,label:"Contractor A",color:"#00eaff"},
+        {id:2,label:"Shell Company",color:"#ff4444"},
+        {id:3,label:"Crypto Wallet",color:"#ffaa00"},
+        {id:4,label:"Suspicious IP",color:"#ff4444"},
+        {id:5,label:"Vendor Network",color:"#00ff99"}
+    ]);
+    var edges = new vis.DataSet([
+        {from:1,to:2}, {from:2,to:3}, {from:3,to:4}, {from:2,to:5}
+    ]);
+    var container = document.getElementById("networkGraph");
+    var data = {nodes:nodes, edges:edges};
+    var options = {
+        nodes:{font:{color:"#ffffff", size: 12}},
+        edges:{color:"#00eaff"},
+        physics:{enabled:true}
+    };
+    new vis.Network(container,data,options);
 }
 
-// Load graph secara automatik bila page dibuka
 window.onload = loadGraph;
 
-/* ATTACK COUNTER */
-let attacks=15432;
+let attacks = 15432;
 setInterval(function(){
-attacks += Math.floor(Math.random()*10);
-document.getElementById("attackCounter").innerText=attacks;
+    attacks += Math.floor(Math.random()*10);
+    document.getElementById("attackCounter").innerText = attacks;
 },2000);
 </script>
 
-<footer style="text-align:center;color:#6b7a90;margin-top:40px;padding:20px;">
-Megatron Cyber Intelligence Lab © 2026<br>
-Designed & Built by Muhammad Asri bin Harun
+<footer style="color:#6b7a90; padding:40px 20px;">
+    Megatron Cyber Intelligence Lab © 2026<br>
+    Designed & Built by Muhammad Asri bin Harun
 </footer>
 
 </body>
