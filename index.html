@@ -36,8 +36,12 @@ font-weight:bold;
 
 .section{
 margin-top:40px;
+display: flex;
+justify-content: center;
+flex-wrap: wrap;
 }
 
+/* KEMASKINI GAYA KAD (STEP 1) */
 .card{
 display:inline-block;
 background:#0d1a2b;
@@ -46,6 +50,15 @@ margin:20px;
 border-radius:10px;
 width:250px;
 box-shadow:0 0 10px #00eaff33;
+cursor: pointer;
+transition: 0.3s ease;
+border: 1px solid transparent;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    border: 1px solid #00eaff;
+    box-shadow: 0 0 25px #00eaff66;
 }
 
 iframe{
@@ -104,6 +117,7 @@ text-transform:uppercase;
 letter-spacing:2px;
 box-shadow:0 0 15px #00eaff66;
 transition:0.3s;
+cursor: pointer;
 }
 
 .btn-cyber:hover{
@@ -111,6 +125,17 @@ background:#00eaff;
 color:#050b18;
 box-shadow:0 0 25px #00eaff;
 }
+
+/* GAYA BUTANG KHAS UNTUK PAGES (STEP 1 ADD-ON) */
+.btn-forensics { 
+    padding:10px 20px; background:#1e90ff; border:none; border-radius:6px; color:white; cursor:pointer; font-weight: bold; transition: 0.3s;
+}
+.btn-forensics:hover { background:#00bfff; box-shadow: 0 0 15px #1e90ff; }
+
+.btn-analyze { 
+    margin-top:20px; padding:10px 20px; background:#ff9800; border:none; border-radius:6px; color:white; cursor:pointer; font-weight: bold; transition: 0.3s;
+}
+.btn-analyze:hover { background:#ffb74d; box-shadow: 0 0 15px #ff9800; }
 
 </style>
 </head>
@@ -131,44 +156,41 @@ MEGATRON CYBER COMMAND CENTER
 <div>
     <a href="catur.html" class="btn-cyber">[+] Mula Simulasi Catur AI</a>
 </div>
+
 <h2>Global Cyber Attack Counter</h2>
-
 <div class="counter" id="attackCounter">15432</div>
-
 <p>Estimated cyber attacks detected worldwide</p>
 
 <div class="mapoverlay"></div>
 
 <div class="section">
 
-<div class="card">
+<div class="card" onclick="document.getElementById('live-map').scrollIntoView({behavior: 'smooth'})">
 <h3>Threat Monitoring</h3>
 <p>Real-time global cyber attack monitoring.</p>
 </div>
 
-<div class="card">
+<div class="card" onclick="location.href='digital_forensics.html'">
 <h3>Digital Forensics</h3>
 <p>Evidence analysis and cyber investigation tools.</p>
 </div>
 
-<div class="card">
+<div class="card" onclick="location.href='financial_crime.html'">
 <h3>Crypto Tracing</h3>
 <p>Track suspicious blockchain transactions.</p>
 </div>
 
-<div class="card">
+<div class="card" onclick="location.href='financial_crime.html'">
 <h3>Network Analysis</h3>
 <p>Investigate criminal financial networks.</p>
 </div>
 
 </div>
 
-<h2>Live Global Cyber Attack Map</h2>
-
+<h2 id="live-map">Live Global Cyber Attack Map</h2>
 <iframe src="https://cybermap.kaspersky.com/en/widget/dynamic/dark"></iframe>
 
 <h2>Live DDoS Threat Map</h2>
-
 <iframe src="https://livethreatmap.radware.com/"></iframe>
 
 <div style="display:flex;justify-content:center;gap:30px;margin-top:50px;flex-wrap:wrap">
@@ -185,16 +207,13 @@ MEGATRON CYBER COMMAND CENTER
 
 <div style="background:#0f1b2e;padding:25px;border-radius:10px;width:280px">
 <h3>Digital Forensics Demo</h3>
-
-<button onclick="openCase()" style="padding:10px 20px;background:#1e90ff;border:none;border-radius:6px;color:white;cursor:pointer;">
+<button class="btn-forensics" onclick="location.href='digital_forensics.html'">
 Open Investigation Case
 </button>
-
 </div>
 
 <div style="background:#0f1b2e;padding:25px;border-radius:10px;width:280px">
 <h3>AI Threat Analytics</h3>
-
 <ul>
 <li>Risk Score Engine</li>
 <li>Financial Pattern Detection</li>
@@ -202,15 +221,12 @@ Open Investigation Case
 <li>Network Graph Intelligence</li>
 <li>Procurement Fraud Detection</li>
 </ul>
-
 </div>
 
 </div>
 
 <div class="feedbox">
-
 <h3>Live Malicious IP Feed</h3>
-
 <ul>
 <li>185.220.101.32 – Botnet Node</li>
 <li>91.219.236.45 – Malware Distribution</li>
@@ -218,29 +234,24 @@ Open Investigation Case
 <li>176.119.1.122 – Command & Control</li>
 <li>45.155.205.233 – Crypto Scam Infrastructure</li>
 </ul>
-
 </div>
 
 <h2 style="margin-top:60px">Procurement Intelligence Network</h2>
-
 <p>Visual analysis of contractor, shell companies and financial links.</p>
 
 <div id="networkGraph"></div>
 
-<button onclick="loadGraph()" style="margin-top:20px;padding:10px 20px;background:#ff9800;border:none;border-radius:6px;color:white;cursor:pointer;">
+<button class="btn-analyze" onclick="location.href='financial_crime.html'">
 Analyze Network
 </button>
 
 <script>
-
+// Fungsi asal anda dikekalkan
 function openCase(){
-
 alert("Investigation Demo\n\nCase: Financial Crime Network\nLocation: Kuala Lumpur\n\nEntities:\n- Shell Company\n- Contractor Network\n- Crypto Wallet")
-
 }
 
 function loadGraph(){
-
 var nodes = new vis.DataSet([
 {id:1,label:"Contractor A",color:"#00eaff"},
 {id:2,label:"Shell Company",color:"#ff4444"},
@@ -257,28 +268,24 @@ var edges = new vis.DataSet([
 ]);
 
 var container=document.getElementById("networkGraph");
-
 var data={nodes:nodes,edges:edges};
-
 var options={
 nodes:{font:{color:"#ffffff"}},
 edges:{color:"#00eaff"},
 physics:{enabled:true}
 };
-
 new vis.Network(container,data,options);
-
 }
 
+// Load graph secara automatik bila page dibuka
+window.onload = loadGraph;
+
 /* ATTACK COUNTER */
-
 let attacks=15432;
-
 setInterval(function(){
 attacks += Math.floor(Math.random()*10);
 document.getElementById("attackCounter").innerText=attacks;
 },2000);
-
 </script>
 
 <footer style="text-align:center;color:#6b7a90;margin-top:40px;padding:20px;">
