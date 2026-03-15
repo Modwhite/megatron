@@ -3,161 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulasi Tactical Catur | MEGATRON</title>
+    <title>AI Tactical Chess | MEGATRON</title>
     <style>
-        body { background: #050b18; color: #00eaff; font-family: Arial, sans-serif; text-align: center; margin: 0; padding: 10px; }
-        header { font-size: 22px; font-weight: bold; text-transform: uppercase; margin: 15px 0; letter-spacing: 2px; }
-        
-        .status-box { background: #0d1a2b; padding: 10px 20px; border-radius: 5px; margin-bottom: 15px; display: inline-block; border: 1px solid #00eaff; }
-        #status { font-weight: bold; text-transform: uppercase; }
-
-        .board {
-            display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            width: 92vw; height: 92vw; max-width: 400px; max-height: 400px;
-            margin: auto; border: 4px solid #00eaff;
+        body {
+            background: #050b18;
+            color: #00eaff;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 10px;
+            overflow-x: hidden;
         }
 
-        .square {
-            width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; -webkit-tap-highlight-color: transparent;
+        header {
+            font-size: clamp(18px, 5vw, 24px);
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 15px 0;
+            letter-spacing: 2px;
+            color: #00eaff;
         }
 
-        .white-sq { background-color: #f0d9b5; }
-        .black-sq { background-color: #b58863; }
-        .selected { background-color: #39ff14 !important; }
-        
-        /* Gambar buah catur */
-        .piece { width: 85%; height: 85%; pointer-events: none; }
+        /* Container untuk Lichess Frame */
+        .chess-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            background: #0d1a2b;
+            border: 2px solid #1e90ff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 234, 255, 0.2);
+            overflow: hidden;
+        }
 
-        .btn-action {
-            display: inline-block; margin-top: 20px; padding: 10px 20px;
-            color: #00eaff; text-decoration: none; border: 1px solid #00eaff;
-            border-radius: 5px; font-size: 14px; background: transparent; cursor: pointer;
+        /* Iframe Lichess */
+        iframe {
+            width: 100%;
+            height: 500px; /* Saiz yang selesa untuk mobile & desktop */
+            border: none;
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            color: #00eaff;
+            text-decoration: none;
+            border: 1px solid #00eaff;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            transition: 0.3s;
+            background: rgba(0, 234, 255, 0.05);
+        }
+
+        .btn-back:hover {
+            background: #00eaff;
+            color: #050b18;
+            box-shadow: 0 0 15px #00eaff;
+        }
+
+        .alert-mini {
+            font-size: 12px;
+            color: #ff4444;
+            margin-top: 10px;
+            font-family: monospace;
         }
     </style>
 </head>
 <body>
 
-    <header>Simulasi Tactical Catur</header>
+    <header>MEGATRON AI TACTICAL CHESS</header>
     
-    <div class="status-box">
-        <span id="status">Giliran: PUTIH</span>
+    <div class="chess-wrapper">
+        <iframe 
+            src="https://lichess.org/export/embed.html?theme=auto&bg=dark" 
+            allowtransparency="true">
+        </iframe>
     </div>
 
-    <div id="board" class="board"></div>
+    <div class="alert-mini">INTEGRATED VIA LICHESS OPEN SOURCE ENGINE</div>
 
-    <button class="btn-action" onclick="resetGame()">Reset Board</button><br>
-    <a href="index.html" class="btn-action" style="border-color: #444; color: #aaa;">← Kembali</a>
+    <a href="index.html" class="btn-back">← KEMBALI KE COMMAND CENTER</a>
 
-    <script>
-        const boardElement = document.getElementById('board');
-        const statusElement = document.getElementById('status');
-        
-        // Mapping URL gambar buah catur yang real (Wikimedia SVG)
-        const piecesImg = {
-            'P': 'https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg',
-            'R': 'https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg',
-            'N': 'https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg',
-            'B': 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg',
-            'Q': 'https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg',
-            'K': 'https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg',
-            'p': 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg',
-            'r': 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg',
-            'n': 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg',
-            'b': 'https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg',
-            'q': 'https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg',
-            'k': 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg'
-        };
-
-        let initialLayout = [
-            ['r','n','b','q','k','b','n','r'],
-            ['p','p','p','p','p','p','p','p'],
-            ['','','','','','','',''],
-            ['','','','','','','',''],
-            ['','','','','','','',''],
-            ['','','','','','','',''],
-            ['P','P','P','P','P','P','P','P'],
-            ['R','N','B','Q','K','B','N','R']
-        ];
-
-        let boardLayout = JSON.parse(JSON.stringify(initialLayout));
-        let selectedSquare = null;
-        let isWhiteTurn = true;
-
-        function createBoard() {
-            boardElement.innerHTML = '';
-            for (let r = 0; r < 8; r++) {
-                for (let c = 0; c < 8; c++) {
-                    const square = document.createElement('div');
-                    square.className = `square ${(r+c)%2===0 ? 'white-sq':'black-sq'}`;
-                    if (selectedSquare && selectedSquare.r === r && selectedSquare.c === c) square.classList.add('selected');
-                    
-                    const p = boardLayout[r][c];
-                    if (p) {
-                        const img = document.createElement('img');
-                        img.src = piecesImg[p];
-                        img.className = 'piece';
-                        square.appendChild(img);
-                    }
-
-                    square.onclick = () => handleMove(r, c);
-                    boardElement.appendChild(square);
-                }
-            }
-        }
-
-        function isLegalMove(fR, fC, tR, tC, piece) {
-            const dr = tR - fR;
-            const dc = tC - fC;
-            const target = boardLayout[tR][tC];
-
-            // Tak boleh makan kawan sendiri
-            if (target && ((isWhiteTurn && target === target.toUpperCase()) || (!isWhiteTurn && target === target.toLowerCase()))) return false;
-
-            const p = piece.toLowerCase();
-            if (p === 'p') { // Logik Pawn (Asas)
-                const dir = piece === 'P' ? -1 : 1;
-                if (fC === tC && target === '' && dr === dir) return true; // Maju 1
-                if (Math.abs(dc) === 1 && dr === dir && target !== '') return true; // Makan
-                return false;
-            }
-            if (p === 'r') return (fR === tR || fC === tC); // Rook
-            if (p === 'n') return (Math.abs(dr) === 2 && Math.abs(dc) === 1) || (Math.abs(dr) === 1 && Math.abs(dc) === 2); // Knight
-            if (p === 'b') return Math.abs(dr) === Math.abs(dc); // Bishop
-            if (p === 'q') return (fR === tR || fC === tC || Math.abs(dr) === Math.abs(dc)); // Queen
-            if (p === 'k') return Math.abs(dr) <= 1 && Math.abs(dc) <= 1; // King
-            return true;
-        }
-
-        function handleMove(r, c) {
-            const p = boardLayout[r][c];
-            if (!selectedSquare) {
-                if (!p || (isWhiteTurn && p !== p.toUpperCase()) || (!isWhiteTurn && p !== p.toLowerCase())) return;
-                selectedSquare = { r, c, p };
-                createBoard();
-            } else {
-                if (isLegalMove(selectedSquare.r, selectedSquare.c, r, c, selectedSquare.p)) {
-                    boardLayout[r][c] = selectedSquare.p;
-                    boardLayout[selectedSquare.r][selectedSquare.c] = '';
-                    isWhiteTurn = !isWhiteTurn;
-                    statusElement.innerText = `Giliran: ${isWhiteTurn ? 'PUTIH' : 'HITAM'}`;
-                } else {
-                    alert("Illegal Move!");
-                }
-                selectedSquare = null;
-                createBoard();
-            }
-        }
-
-        function resetGame() {
-            boardLayout = JSON.parse(JSON.stringify(initialLayout));
-            isWhiteTurn = true;
-            statusElement.innerText = "Giliran: PUTIH";
-            createBoard();
-        }
-
-        createBoard();
-    </script>
 </body>
 </html>
