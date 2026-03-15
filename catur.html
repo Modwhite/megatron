@@ -7,7 +7,7 @@
     
     <style>
         body { 
-            font-family: Arial, sans-serif; 
+            font-family: 'Segoe UI', Arial, sans-serif; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -61,19 +61,50 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.0/stockfish.js"></script>
 
     <script>
         var board = null;
         var game = new Chess();
-        var stockfish = new Worker('https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.0/stockfish.js');
+        var stockfish = null;
         var $status = $('#status');
+
+        // Melukis papan catur DAHULU supaya ia tidak diganggu oleh proses pemuatan AI
+        var config = { 
+            draggable: true, 
+            position: 'start', 
+            onDragStart: onDragStart, 
+            onDrop: onDrop, 
+            onSnapEnd: onSnapEnd,
+            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+        };
+        board = Chessboard('myBoard', config);
+        updateStatus();
         
-        stockfish.postMessage('uci');
+        // Trik memuatkan AI (Web Worker) untuk mengelakkan sekatan keselamatan pelayar web
+        fetch('https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.0/stockfish.js')
+            .then(response => response.text())
+            .then(text => {
+                var blob = new Blob([text], {type: 'application/javascript'});
+                var workerUrl = URL.createObjectURL(blob);
+                stockfish = new Worker(workerUrl);
+                stockfish.postMessage('uci');
+                
+                stockfish.onmessage = function(event) {
+                    var line = event.data;
+                    if (line && line.indexOf('bestmove') > -1) {
+                        var match = line.match(/^bestmove ([a-h][1-8])([a-h][1-8])([qrbn])?/);
+                        if (match) {
+                            game.move({ from: match[1], to: match[2], promotion: match[3] });
+                            board.position(game.fen());
+                            updateStatus();
+                        }
+                    }
+                };
+            })
+            .catch(err => console.error("Gagal memuatkan AI: ", err));
 
         function onDragStart (source, piece, position, orientation) {
             if (game.game_over()) return false;
-            // Elak pemain gerakkan buah AI
             if (piece.search(/^b/) !== -1 && $('#gameMode').val() === 'ai') return false; 
         }
 
@@ -89,6 +120,7 @@
         }
 
         function makeRandomMove () {
+            if (!stockfish) return; // Jika AI belum sedia, tunggu sekejap
             var skillLevel = $('#aiLevel').val();
             var fen = game.fen();
             
@@ -96,18 +128,6 @@
             stockfish.postMessage('position fen ' + fen);
             stockfish.postMessage('go depth 10'); 
         }
-
-        stockfish.onmessage = function(event) {
-            var line = event.data;
-            if (line && line.indexOf('bestmove') > -1) {
-                var match = line.match(/^bestmove ([a-h][1-8])([a-h][1-8])([qrbn])?/);
-                if (match) {
-                    game.move({ from: match[1], to: match[2], promotion: match[3] });
-                    board.position(game.fen());
-                    updateStatus();
-                }
-            }
-        };
 
         function onSnapEnd () { board.position(game.fen()); }
 
@@ -129,20 +149,6 @@
             board.start();
             updateStatus();
         }
-
-        // KONFIGURASI PAPAN - SINI PUNCA DIA KOSONG SEBELUM NI!
-        var config = { 
-            draggable: true, 
-            position: 'start', 
-            onDragStart: onDragStart, 
-            onDrop: onDrop, 
-            onSnapEnd: onSnapEnd,
-            // Baris di bawah ini menarik gambar buah catur dari internet
-            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
-        };
-        
-        board = Chessboard('myBoard', config);
-        updateStatus();
     </script>
 </body>
 </html>
