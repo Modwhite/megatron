@@ -2,19 +2,42 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <title>Master Catur Web</title>
+    <title>Simulasi Catur AI - MEGATRON</title>
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css">
+    
     <style>
-        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; background-color: #f4f4f9; padding: 20px; }
-        #myBoard { width: 400px; margin-bottom: 20px; }
-        .controls { display: flex; gap: 10px; margin-bottom: 20px; }
-        select, button { padding: 10px; font-size: 16px; cursor: pointer; }
-        #status { font-weight: bold; margin-bottom: 10px; color: #333; }
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background-color: #050b18; /* Warna latar gelap Megatron */
+            color: #00eaff; /* Warna teks neon */
+            padding: 40px 20px; 
+            margin: 0;
+        }
+        h2 { text-transform: uppercase; letter-spacing: 2px; }
+        #myBoard { width: 400px; margin-bottom: 20px; box-shadow: 0 0 20px #00eaff66; border-radius: 5px; }
+        .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center;}
+        select, button { 
+            padding: 10px 15px; 
+            font-size: 14px; 
+            cursor: pointer; 
+            background: #0d1a2b; 
+            color: #00eaff; 
+            border: 1px solid #00eaff; 
+            border-radius: 5px; 
+            font-weight: bold;
+        }
+        select:hover, button:hover { background: #00eaff; color: #050b18; }
+        #status { font-weight: bold; margin-bottom: 15px; font-size: 18px; color: #ff4444; }
+        .back-btn { margin-top: 30px; text-decoration: none; color: #aaa; font-size: 14px; }
+        .back-btn:hover { color: #fff; }
     </style>
 </head>
 <body>
 
-    <h2>Latihan Catur AI</h2>
+    <h2>Simulasi Taktikal Catur</h2>
     
     <div class="controls">
         <select id="gameMode">
@@ -22,20 +45,22 @@
             <option value="ai">Lawan AI (Komputer)</option>
         </select>
         <select id="aiLevel">
-            <option value="5">Tahap Pertengahan (Intermediate)</option>
-            <option value="10">Tahap Mahir (Advanced)</option>
+            <option value="5">Tahap Pertengahan</option>
+            <option value="10">Tahap Mahir</option>
             <option value="20">Tahap Grandmaster</option>
         </select>
-        <button onclick="startNewGame()">Mula Permainan Baru</button>
+        <button onclick="startNewGame()">Mula Semula</button>
     </div>
 
-    <div id="status">Giliran Putih</div>
+    <div id="status">Sistem Sedia: Giliran Putih</div>
+    
     <div id="myBoard"></div>
+
+    <a href="index.html" class="back-btn">← Kembali ke Command Center</a>
 
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.0/stockfish.js"></script>
 
     <script>
@@ -44,12 +69,12 @@
         var stockfish = new Worker('https://cdnjs.cloudflare.com/ajax/libs/stockfish.js/10.0.0/stockfish.js');
         var $status = $('#status');
         
-        // Tetapkan enjin AI
         stockfish.postMessage('uci');
 
         function onDragStart (source, piece, position, orientation) {
             if (game.game_over()) return false;
-            if (piece.search(/^b/) !== -1 && $('#gameMode').val() === 'ai') return false; // Elak gerak buah AI
+            // Elak pemain gerakkan buah AI
+            if (piece.search(/^b/) !== -1 && $('#gameMode').val() === 'ai') return false; 
         }
 
         function onDrop (source, target) {
@@ -59,7 +84,7 @@
             updateStatus();
 
             if ($('#gameMode').val() === 'ai' && !game.game_over()) {
-                window.setTimeout(makeRandomMove, 250); // Panggil AI untuk berfikir
+                window.setTimeout(makeRandomMove, 250);
             }
         }
 
@@ -67,13 +92,11 @@
             var skillLevel = $('#aiLevel').val();
             var fen = game.fen();
             
-            // Arahkan Stockfish untuk mencari langkah terbaik berdasarkan tahap
             stockfish.postMessage('setoption name Skill Level value ' + skillLevel);
             stockfish.postMessage('position fen ' + fen);
-            stockfish.postMessage('go depth 10'); // Cari sedalam 10 langkah (Boleh dilaras)
+            stockfish.postMessage('go depth 10'); 
         }
 
-        // Menerima langkah dari Stockfish
         stockfish.onmessage = function(event) {
             var line = event.data;
             if (line && line.indexOf('bestmove') > -1) {
@@ -92,11 +115,11 @@
             var statusHTML = '';
             var moveColor = (game.turn() === 'w') ? 'Putih' : 'Hitam';
             
-            if (game.in_checkmate()) statusHTML = 'Game over, ' + moveColor + ' tewas (Checkmate).';
-            else if (game.in_draw()) statusHTML = 'Game over, seri (Draw).';
+            if (game.in_checkmate()) statusHTML = 'AMARAN: ' + moveColor + ' Tewas (Checkmate).';
+            else if (game.in_draw()) statusHTML = 'STATUS: Seri (Draw).';
             else {
-                statusHTML = 'Giliran ' + moveColor;
-                if (game.in_check()) statusHTML += ', ' + moveColor + ' dalam keadaan Check!';
+                statusHTML = 'Giliran: ' + moveColor;
+                if (game.in_check()) statusHTML += ' | AMARAN: Check!';
             }
             $status.html(statusHTML);
         }
@@ -107,7 +130,17 @@
             updateStatus();
         }
 
-        var config = { draggable: true, position: 'start', onDragStart: onDragStart, onDrop: onDrop, onSnapEnd: onSnapEnd };
+        // KONFIGURASI PAPAN - SINI PUNCA DIA KOSONG SEBELUM NI!
+        var config = { 
+            draggable: true, 
+            position: 'start', 
+            onDragStart: onDragStart, 
+            onDrop: onDrop, 
+            onSnapEnd: onSnapEnd,
+            // Baris di bawah ini menarik gambar buah catur dari internet
+            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'
+        };
+        
         board = Chessboard('myBoard', config);
         updateStatus();
     </script>
