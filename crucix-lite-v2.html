@@ -193,9 +193,13 @@ function loadDashboard(){
 
   // 🌍 GLOBE
   const globe = Globe()
-    (document.getElementById('globe'))
-    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
-    .backgroundColor('#020408');
+  (document.getElementById('globe'))
+  .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
+  .backgroundColor('#020408');
+
+// AUTO ROTATE
+globe.controls().autoRotate = true;
+globe.controls().autoRotateSpeed = 0.5;
 
 }
 
