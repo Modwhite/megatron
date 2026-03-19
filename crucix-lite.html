@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CRUCIX LITE</title>
+
+<style>
+body {
+  margin:0;
+  background:#020408;
+  color:#e8f4f0;
+  font-family:monospace;
+}
+
+#loading {
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+}
+
+#dashboard {
+  display:none;
+  padding:10px;
+}
+
+.panel {
+  border:1px solid rgba(100,240,200,0.2);
+  padding:10px;
+  margin:5px;
+}
+
+.container {
+  display:flex;
+}
+
+.left {width:20%;}
+.center {width:60%;}
+.right {width:20%;}
+
+h3 {color:#64f0c8;}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <h2>CRUCIX INITIALIZING...</h2>
+  <p id="status">Connecting OSINT sources...</p>
+</div>
+
+<div id="dashboard">
+
+  <div class="container">
+
+    <!-- LEFT -->
+    <div class="left panel">
+      <h3>SENSOR GRID</h3>
+      <div id="metrics"></div>
+    </div>
+
+    <!-- CENTER -->
+    <div class="center panel">
+      <h3>WORLD MAP</h3>
+      <p>(Map nanti kita upgrade)</p>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="right panel">
+      <h3>OSINT FEED</h3>
+      <div id="feed"></div>
+    </div>
+
+  </div>
+
+  <!-- NEWS -->
+  <div class="panel">
+    <h3>LIVE NEWS</h3>
+    <div id="news"></div>
+  </div>
+
+</div>
+<script>
+
+const metrics = {
+  air: 120,
+  thermal: 3200,
+  conflict: 8,
+  news: 25
+};
+
+const osintFeed = [
+  "ISYARAT: Aktiviti udara meningkat di South China Sea",
+  "ALERT: Missile strike dilaporkan di Middle East",
+  "PERHATIAN: Pergerakan kapal meningkat di Selat Melaka",
+  "INFO: Economic slowdown signal detected (FRED data)"
+];
+
+const newsTicker = [
+  "[BERITA] Ekonomi global menunjukkan tanda kelembapan",
+  "[BREAKING] Konflik meningkat di kawasan sempadan",
+  "[INFO] Aktiviti perdagangan maritim meningkat",
+  "[UPDATE] Polisi baharu memberi kesan kepada pasaran"
+];
+
+</script>
+<script>
+
+function loadDashboard(){
+
+  // METRICS
+  const m = document.getElementById("metrics");
+  m.innerHTML = `
+    Air Activity: ${metrics.air}<br>
+    Thermal: ${metrics.thermal}<br>
+    Conflict: ${metrics.conflict}<br>
+    News: ${metrics.news}
+  `;
+
+  // OSINT
+  const f = document.getElementById("feed");
+  osintFeed.forEach(item=>{
+    const div = document.createElement("div");
+    div.innerText = item;
+    f.appendChild(div);
+  });
+
+  // NEWS
+  const n = document.getElementById("news");
+  newsTicker.forEach(item=>{
+    const div = document.createElement("div");
+    div.innerText = item;
+    n.appendChild(div);
+  });
+
+}
+
+</script>
+<script>
+
+setTimeout(()=>{
+  document.getElementById("loading").style.display="none";
+  document.getElementById("dashboard").style.display="block";
+  loadDashboard();
+},3000);
+
+</script>
+
+</body>
+</html>
