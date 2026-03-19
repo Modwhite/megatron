@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CRUCIX LITE</title>
+<title>CRUCIX LITE v2</title>
 
 <style>
 body {
@@ -57,7 +57,7 @@ h3 {
   padding-bottom:5px;
 }
 
-/* FEED STYLE */
+/* FEED */
 .feed-item {
   border-left:2px solid #64f0c8;
   padding-left:6px;
@@ -97,7 +97,7 @@ h3 {
 
   <div class="container">
 
-html
+```
 <!-- LEFT -->
 <div class="left panel">
   <h3>SENSOR GRID</h3>
@@ -115,6 +115,7 @@ html
   <h3>OSINT FEED</h3>
   <div id="feed"></div>
 </div>
+```
 
   </div>
 
@@ -167,7 +168,7 @@ function loadDashboard(){
   const f = document.getElementById("feed");
   osintFeed.forEach(item=>{
     const div = document.createElement("div");
-    div.className = "feed-item";   // ✅ FIXED
+    div.className = "feed-item";
     div.innerText = item;
     f.appendChild(div);
   });
@@ -178,34 +179,3 @@ function loadDashboard(){
     const div = document.createElement("div");
     div.className = "news-item";
     div.innerText = item;
-    n.appendChild(div);
-  });
-
-}
-
-/* LOADING TEXT */
-let statusText = [
-  "Connecting OSINT sources...",
-  "Processing intelligence feeds...",
-  "Analyzing global signals...",
-  "Finalizing dashboard..."
-];
-
-let i = 0;
-let interval = setInterval(()=>{
-  document.getElementById("status").innerText = statusText[i];
-  i++;
-  if(i >= statusText.length) clearInterval(interval);
-},1000);
-
-/* START */
-setTimeout(()=>{
-  document.getElementById("loading").style.display="none";
-  document.getElementById("dashboard").style.display="block";
-  loadDashboard();
-},3000);
-
-</script>
-
-</body>
-</html>
