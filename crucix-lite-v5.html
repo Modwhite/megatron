@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CRUCIX LITE v4</title>
+<title>CRUCIX LITE v5</title>
 
 <script src="https://unpkg.com/globe.gl"></script>
 
@@ -47,7 +47,13 @@ body {
 }
 
 .left {width:20%;}
-.center {width:60%;}
+
+.center {
+  width:60%;
+  display:flex;
+  justify-content:center;
+}
+
 .right {width:20%;}
 
 h3 {
@@ -58,6 +64,7 @@ h3 {
 
 #globe {
   height:300px;
+  width:100%;
 }
 
 .feed-item {
@@ -129,13 +136,12 @@ const metrics = {
   news: 25
 };
 
-/* 🌍 TITIK MAP (OSINT STYLE) */
 const points = [
-  { lat: 5.4, lng: 100.3, size: 0.4, color: "green" },   // Malaysia
-  { lat: 25.2, lng: 55.3, size: 0.5, color: "red" },     // Middle East
-  { lat: 35.6, lng: 139.6, size: 0.3, color: "yellow" }, // Japan
-  { lat: 51.5, lng: -0.1, size: 0.3, color: "blue" },    // UK
-  { lat: -6.2, lng: 106.8, size: 0.4, color: "green" }   // Indonesia
+  { lat: 5.4, lng: 100.3, size: 0.02, color: "green" },
+  { lat: 25.2, lng: 55.3, size: 0.03, color: "red" },
+  { lat: 35.6, lng: 139.6, size: 0.02, color: "yellow" },
+  { lat: 51.5, lng: -0.1, size: 0.02, color: "blue" },
+  { lat: -6.2, lng: 106.8, size: 0.02, color: "green" }
 ];
 
 const osintFeed = [
@@ -163,7 +169,10 @@ function loadDashboard(){
     News: ${metrics.news}
   `;
 
+  // OSINT
   const f = document.getElementById("feed");
+  f.innerHTML = "";
+
   osintFeed.forEach(item=>{
     const div = document.createElement("div");
     div.className = "feed-item";
@@ -171,27 +180,33 @@ function loadDashboard(){
     f.appendChild(div);
   });
 
-  const n = document.getElementById("news");
-  newsTicker.forEach(item=>{
-    const div = document.createElement("div");
-    div.className = "news-item";
-    div.innerText = item;
-    n.appendChild(div);
-  });
+  // NEWS ticker start
+  startNewsTicker();
 
-  /* 🌍 GLOBE + TITIK */
+  // 🌍 GLOBE
   const globe = Globe()
     (document.getElementById('globe'))
     .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
     .backgroundColor('#020408')
     .pointsData(points)
     .pointAltitude("size")
+    .pointRadius(0.3)
     .pointColor("color");
 
   globe.controls().autoRotate = true;
   globe.controls().autoRotateSpeed = 0.6;
   globe.pointOfView({ altitude: 2.5 });
+}
 
+/* NEWS TICKER */
+function startNewsTicker(){
+  const n = document.getElementById("news");
+  let i = 0;
+
+  setInterval(()=>{
+    n.innerHTML = `<div class="news-item">${newsTicker[i]}</div>`;
+    i = (i + 1) % newsTicker.length;
+  }, 2000);
 }
 
 /* LOADING */
