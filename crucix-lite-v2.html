@@ -4,7 +4,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CRUCIX LITE v2</title>
+<title>CRUCIX LITE v3</title>
+
+<!-- GLOBE LIBRARY -->
+
+<script src="https://unpkg.com/globe.gl"></script>
 
 <style>
 body {
@@ -57,6 +61,11 @@ h3 {
   padding-bottom:5px;
 }
 
+/* GLOBE */
+#globe {
+  height:400px;
+}
+
 /* FEED */
 .feed-item {
   border-left:2px solid #64f0c8;
@@ -107,7 +116,7 @@ h3 {
 <!-- CENTER -->
 <div class="center panel">
   <h3>WORLD MAP</h3>
-  <p>(Map module coming soon...)</p>
+  <div id="globe"></div>
 </div>
 
 <!-- RIGHT -->
@@ -164,7 +173,7 @@ function loadDashboard(){
     News: ${metrics.news}
   `;
 
-  // OSINT FEED
+  // OSINT
   const f = document.getElementById("feed");
   osintFeed.forEach(item=>{
     const div = document.createElement("div");
@@ -179,3 +188,40 @@ function loadDashboard(){
     const div = document.createElement("div");
     div.className = "news-item";
     div.innerText = item;
+    n.appendChild(div);
+  });
+
+  // 🌍 GLOBE
+  const globe = Globe()
+    (document.getElementById('globe'))
+    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
+    .backgroundColor('#020408');
+
+}
+
+/* LOADING TEXT */
+let statusText = [
+  "Connecting OSINT sources...",
+  "Processing intelligence feeds...",
+  "Analyzing global signals...",
+  "Finalizing dashboard..."
+];
+
+let i = 0;
+let interval = setInterval(()=>{
+  document.getElementById("status").innerText = statusText[i];
+  i++;
+  if(i >= statusText.length) clearInterval(interval);
+},1000);
+
+/* START */
+setTimeout(()=>{
+  document.getElementById("loading").style.display="none";
+  document.getElementById("dashboard").style.display="block";
+  loadDashboard();
+},3000);
+
+</script>
+
+</body>
+</html>
