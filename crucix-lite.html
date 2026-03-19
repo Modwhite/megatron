@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ms">
 <head>
 <meta charset="UTF-8">
@@ -13,6 +14,7 @@ body {
   font-family:monospace;
 }
 
+/* LOADING */
 #loading {
   height:100vh;
   display:flex;
@@ -21,68 +23,114 @@ body {
   flex-direction:column;
 }
 
+#status {
+  color:#64f0c8;
+  margin-top:10px;
+}
+
+/* DASHBOARD */
 #dashboard {
   display:none;
   padding:10px;
 }
 
+.container {
+  display:flex;
+  gap:10px;
+}
+
+/* PANEL */
 .panel {
   border:1px solid rgba(100,240,200,0.2);
   padding:10px;
   margin:5px;
-}
-
-.container {
-  display:flex;
+  background:rgba(0,0,0,0.3);
 }
 
 .left {width:20%;}
 .center {width:60%;}
 .right {width:20%;}
 
-h3 {color:#64f0c8;}
+h3 {
+  color:#64f0c8;
+  border-bottom:1px solid rgba(100,240,200,0.2);
+  padding-bottom:5px;
+}
+
+/* FEED STYLE */
+.feed-item {
+  border-left:2px solid #64f0c8;
+  padding-left:6px;
+  margin-bottom:6px;
+  font-size:12px;
+}
+
+/* NEWS */
+.news-item {
+  font-size:12px;
+  margin-bottom:4px;
+}
+
+/* BLINK */
+.blink {
+  animation: blink 1s infinite;
+}
+@keyframes blink {
+  50% {opacity:0.3;}
+}
 </style>
+
 </head>
+
 <body>
 
+<!-- LOADING -->
+
 <div id="loading">
-  <h2>CRUCIX INITIALIZING...</h2>
+  <h2 class="blink">CRUCIX INITIALIZING...</h2>
   <p id="status">Connecting OSINT sources...</p>
 </div>
+
+<!-- DASHBOARD -->
 
 <div id="dashboard">
 
   <div class="container">
 
-    <!-- LEFT -->
-    <div class="left panel">
-      <h3>SENSOR GRID</h3>
-      <div id="metrics"></div>
-    </div>
+```
+<!-- LEFT -->
+<div class="left panel">
+  <h3>SENSOR GRID</h3>
+  <div id="metrics"></div>
+</div>
 
-    <!-- CENTER -->
-    <div class="center panel">
-      <h3>WORLD MAP</h3>
-      <p>(Map nanti kita upgrade)</p>
-    </div>
+<!-- CENTER -->
+<div class="center panel">
+  <h3>WORLD MAP</h3>
+  <p>(Map module coming soon...)</p>
+</div>
 
-    <!-- RIGHT -->
-    <div class="right panel">
-      <h3>OSINT FEED</h3>
-      <div id="feed"></div>
-    </div>
+<!-- RIGHT -->
+<div class="right panel">
+  <h3>OSINT FEED</h3>
+  <div id="feed"></div>
+</div>
+```
 
   </div>
 
   <!-- NEWS -->
+
   <div class="panel">
     <h3>LIVE NEWS</h3>
     <div id="news"></div>
   </div>
 
 </div>
+
 <script>
 
+/* DATA */
 const metrics = {
   air: 120,
   thermal: 3200,
@@ -104,9 +152,7 @@ const newsTicker = [
   "[UPDATE] Polisi baharu memberi kesan kepada pasaran"
 ];
 
-</script>
-<script>
-
+/* FUNCTION */
 function loadDashboard(){
 
   // METRICS
@@ -118,10 +164,11 @@ function loadDashboard(){
     News: ${metrics.news}
   `;
 
-  // OSINT
+  // OSINT FEED
   const f = document.getElementById("feed");
   osintFeed.forEach(item=>{
     const div = document.createElement("div");
+    div.className = "feed-item";   // ✅ FIXED
     div.innerText = item;
     f.appendChild(div);
   });
@@ -130,15 +177,29 @@ function loadDashboard(){
   const n = document.getElementById("news");
   newsTicker.forEach(item=>{
     const div = document.createElement("div");
+    div.className = "news-item";
     div.innerText = item;
     n.appendChild(div);
   });
 
 }
 
-</script>
-<script>
+/* LOADING TEXT */
+let statusText = [
+  "Connecting OSINT sources...",
+  "Processing intelligence feeds...",
+  "Analyzing global signals...",
+  "Finalizing dashboard..."
+];
 
+let i = 0;
+let interval = setInterval(()=>{
+  document.getElementById("status").innerText = statusText[i];
+  i++;
+  if(i >= statusText.length) clearInterval(interval);
+},1000);
+
+/* START */
 setTimeout(()=>{
   document.getElementById("loading").style.display="none";
   document.getElementById("dashboard").style.display="block";
