@@ -4,9 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CRUCIX LITE v3</title>
-
-<!-- GLOBE LIBRARY -->
+<title>CRUCIX LITE v4</title>
 
 <script src="https://unpkg.com/globe.gl"></script>
 
@@ -18,7 +16,6 @@ body {
   font-family:monospace;
 }
 
-/* LOADING */
 #loading {
   height:100vh;
   display:flex;
@@ -32,7 +29,6 @@ body {
   margin-top:10px;
 }
 
-/* DASHBOARD */
 #dashboard {
   display:none;
   padding:10px;
@@ -43,7 +39,6 @@ body {
   gap:10px;
 }
 
-/* PANEL */
 .panel {
   border:1px solid rgba(100,240,200,0.2);
   padding:10px;
@@ -61,12 +56,10 @@ h3 {
   padding-bottom:5px;
 }
 
-/* GLOBE */
 #globe {
-  height:400px;
+  height:300px;
 }
 
-/* FEED */
 .feed-item {
   border-left:2px solid #64f0c8;
   padding-left:6px;
@@ -74,13 +67,11 @@ h3 {
   font-size:12px;
 }
 
-/* NEWS */
 .news-item {
   font-size:12px;
   margin-bottom:4px;
 }
 
-/* BLINK */
 .blink {
   animation: blink 1s infinite;
 }
@@ -93,33 +84,26 @@ h3 {
 
 <body>
 
-<!-- LOADING -->
-
 <div id="loading">
   <h2 class="blink">CRUCIX INITIALIZING...</h2>
   <p id="status">Connecting OSINT sources...</p>
 </div>
-
-<!-- DASHBOARD -->
 
 <div id="dashboard">
 
   <div class="container">
 
 ```
-<!-- LEFT -->
 <div class="left panel">
   <h3>SENSOR GRID</h3>
   <div id="metrics"></div>
 </div>
 
-<!-- CENTER -->
 <div class="center panel">
   <h3>WORLD MAP</h3>
   <div id="globe"></div>
 </div>
 
-<!-- RIGHT -->
 <div class="right panel">
   <h3>OSINT FEED</h3>
   <div id="feed"></div>
@@ -127,8 +111,6 @@ h3 {
 ```
 
   </div>
-
-  <!-- NEWS -->
 
   <div class="panel">
     <h3>LIVE NEWS</h3>
@@ -147,6 +129,15 @@ const metrics = {
   news: 25
 };
 
+/* 🌍 TITIK MAP (OSINT STYLE) */
+const points = [
+  { lat: 5.4, lng: 100.3, size: 0.4, color: "green" },   // Malaysia
+  { lat: 25.2, lng: 55.3, size: 0.5, color: "red" },     // Middle East
+  { lat: 35.6, lng: 139.6, size: 0.3, color: "yellow" }, // Japan
+  { lat: 51.5, lng: -0.1, size: 0.3, color: "blue" },    // UK
+  { lat: -6.2, lng: 106.8, size: 0.4, color: "green" }   // Indonesia
+];
+
 const osintFeed = [
   "ISYARAT: Aktiviti udara meningkat di South China Sea",
   "ALERT: Missile strike dilaporkan di Middle East",
@@ -164,7 +155,6 @@ const newsTicker = [
 /* FUNCTION */
 function loadDashboard(){
 
-  // METRICS
   const m = document.getElementById("metrics");
   m.innerHTML = `
     Air Activity: ${metrics.air}<br>
@@ -173,7 +163,6 @@ function loadDashboard(){
     News: ${metrics.news}
   `;
 
-  // OSINT
   const f = document.getElementById("feed");
   osintFeed.forEach(item=>{
     const div = document.createElement("div");
@@ -182,7 +171,6 @@ function loadDashboard(){
     f.appendChild(div);
   });
 
-  // NEWS
   const n = document.getElementById("news");
   newsTicker.forEach(item=>{
     const div = document.createElement("div");
@@ -191,19 +179,22 @@ function loadDashboard(){
     n.appendChild(div);
   });
 
-  // 🌍 GLOBE
+  /* 🌍 GLOBE + TITIK */
   const globe = Globe()
-  (document.getElementById('globe'))
-  .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
-  .backgroundColor('#020408');
+    (document.getElementById('globe'))
+    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
+    .backgroundColor('#020408')
+    .pointsData(points)
+    .pointAltitude("size")
+    .pointColor("color");
 
-// AUTO ROTATE
-globe.controls().autoRotate = true;
-globe.controls().autoRotateSpeed = 0.5;
+  globe.controls().autoRotate = true;
+  globe.controls().autoRotateSpeed = 0.6;
+  globe.pointOfView({ altitude: 2.5 });
 
 }
 
-/* LOADING TEXT */
+/* LOADING */
 let statusText = [
   "Connecting OSINT sources...",
   "Processing intelligence feeds...",
@@ -218,7 +209,6 @@ let interval = setInterval(()=>{
   if(i >= statusText.length) clearInterval(interval);
 },1000);
 
-/* START */
 setTimeout(()=>{
   document.getElementById("loading").style.display="none";
   document.getElementById("dashboard").style.display="block";
