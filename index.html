@@ -7,6 +7,8 @@
     
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         :root {
@@ -15,7 +17,7 @@
             --danger: #ff4444;
             --bg-dark: #02060f;
             --panel-bg: rgba(13, 26, 43, 0.85);
-            --sidebar-width: 70px;
+            --sidebar-width: 75px;
             --glass-border: rgba(0, 234, 255, 0.2);
         }
 
@@ -29,7 +31,7 @@
             overflow: hidden;
         }
 
-        /* Sidebar Navigation - Pro Agent Style */
+        /* Sidebar Navigation */
         .sidebar {
             width: var(--sidebar-width);
             background: #01040a;
@@ -42,8 +44,8 @@
         }
 
         .nav-item {
-            width: 48px;
-            height: 48px;
+            width: 50px;
+            height: 50px;
             margin-bottom: 25px;
             display: flex;
             align-items: center;
@@ -52,6 +54,7 @@
             cursor: pointer;
             transition: 0.3s;
             color: #444;
+            position: relative;
         }
 
         .nav-item:hover, .nav-item.active {
@@ -101,8 +104,6 @@
             transition: 0.3s;
         }
 
-        .panel:hover { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 234, 255, 0.1); }
-
         .panel-header {
             display: flex;
             justify-content: space-between;
@@ -116,12 +117,11 @@
             text-transform: uppercase;
         }
 
-        /* Responsive Columns */
+        /* Columns */
         .col-4 { grid-column: span 4; }
         .col-8 { grid-column: span 8; }
         .col-12 { grid-column: span 12; }
 
-        /* Tactical Tools UI */
         input {
             width: 100%;
             background: #000;
@@ -162,7 +162,21 @@
             font-size: 13px;
         }
 
-        /* Mobile Viewports */
+        /* PDF Export Button Special Style */
+        .btn-pdf {
+            background: var(--danger);
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         @media (max-width: 1024px) {
             .col-4, .col-8 { grid-column: span 12; }
             body { flex-direction: column-reverse; }
@@ -173,20 +187,26 @@
 <body>
 
     <nav class="sidebar">
-        <div class="nav-item active"><i class="fas fa-desktop"></i></div>
-        <div class="nav-item" onclick="location.href='digital_forensics.html'"><i class="fas fa-search-dollar"></i></div>
-        <div class="nav-item" onclick="location.href='financial_crime.html'"><i class="fas fa-project-diagram"></i></div>
-        <div class="nav-item" onclick="location.href='catur.html'"><i class="fas fa-brain"></i></div>
+        <div class="nav-item active" title="Command Center"><i class="fas fa-desktop"></i></div>
+        <div class="nav-item" onclick="location.href='cases.html'" title="Kes Repository"><i class="fas fa-folder-open"></i></div>
+        <div class="nav-item" onclick="location.href='digital_forensics.html'" title="Forensics"><i class="fas fa-search-dollar"></i></div>
+        <div class="nav-item" onclick="location.href='financial_crime.html'" title="Financial/SPRM"><i class="fas fa-project-diagram"></i></div>
+        <div class="nav-item" onclick="location.href='catur.html'" title="Tactical AI"><i class="fas fa-brain"></i></div>
         <div class="nav-item" style="margin-top: auto; color: var(--danger);"><i class="fas fa-lock"></i></div>
     </nav>
 
-    <div class="main-container">
+    <div class="main-container" id="printableArea">
         <header>
             <div class="brand">
-                <h1>MEGATRON <span>Command Unit v2.0</span></h1>
+                <h1>MEGATRON <span>Command Unit v2.2 Elite</span></h1>
             </div>
-            <div style="font-size: 11px; font-family: monospace;">
-                <span class="status-blink" style="color:var(--danger)">● TOP SECRET ACCESS</span> | NODE_MY_KL_09
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <button class="btn-pdf" onclick="exportToPDF()">
+                    <i class="fas fa-file-pdf"></i> EXPORT INTEL REPORT
+                </button>
+                <div style="font-size: 11px; font-family: monospace;">
+                    <span class="status-blink" style="color:var(--danger)">● TOP SECRET ACCESS</span> | NODE_MY_KL_09
+                </div>
             </div>
         </header>
 
@@ -197,10 +217,10 @@
                     <span>OSINT Identity Tracker</span>
                     <i class="fas fa-fingerprint"></i>
                 </div>
-                <input type="text" id="subjectIn" placeholder="Masukkan Username, IP, atau E-mel...">
-                <button class="btn-action" onclick="runTracker()">Mula Jejak</button>
+                <input type="text" id="subjectIn" placeholder="Target Username, IP, Email...">
+                <button class="btn-action" onclick="runTracker()">Analyze Profile</button>
                 <div id="trackerLogs" style="height: 120px; overflow-y: auto; font-size: 11px; color: #39ff14; margin-top: 15px; font-family: monospace; background: #000; padding: 10px;">
-                    > Menunggu input sasaran...
+                    > Waiting for target input...
                 </div>
             </div>
 
@@ -210,14 +230,14 @@
                     <i class="fas fa-gavel"></i>
                 </div>
                 <div style="font-size: 28px; font-weight: 900; color: var(--neon-orange);" id="corruptionIdx">0%</div>
-                <div style="font-size: 10px; margin-bottom: 10px;">INDEKS RISIKO PROKSI & KONTRAK</div>
+                <div style="font-size: 10px; margin-bottom: 10px;">RISK OF PROXY NETWORKS</div>
                 <div style="height: 8px; background: #111; border-radius: 4px; overflow: hidden;">
                     <div id="corruptionFill" style="height: 100%; width: 0%; background: var(--neon-orange); transition: 1.5s;"></div>
                 </div>
                 <div style="margin-top: 20px; font-size: 12px; display: flex; justify-content: space-around;">
                     <div style="text-align:center">🔍 <br> <b>14</b> <br> Vendor</div>
                     <div style="text-align:center">💼 <br> <b>03</b> <br> Syarikat Shell</div>
-                    <div style="text-align:center">💸 <br> <b>8.2M</b> <br> Aliran</div>
+                    <div style="text-align:center">💸 <br> <b>8.2M</b> <br> Cash Flow</div>
                 </div>
             </div>
 
@@ -229,30 +249,28 @@
                 <div style="display: flex; justify-content: space-around; align-items: center; height: 100px;">
                     <div style="text-align: center;">
                         <div style="font-size: 24px; color: var(--neon-blue);">312</div>
-                        <div style="font-size: 9px;">PORT AKTIF</div>
+                        <div style="font-size: 9px;">PORTS SCANNED</div>
                     </div>
                     <div style="text-align: center;">
                         <div style="font-size: 24px; color: var(--danger);">02</div>
-                        <div style="font-size: 9px;">ANOMALI KRITIKAL</div>
+                        <div style="font-size: 9px;">CRITICAL ANOMALY</div>
                     </div>
                 </div>
-                <button class="btn-action" style="background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); font-size: 10px;" onclick="alert('Memulakan Deep Scan...')">Imbas Kerentanan</button>
+                <button class="btn-action" style="background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); font-size: 10px;" onclick="alert('Scanning Ports...')">Run Vulnerability Scan</button>
             </div>
 
             <div class="panel col-8">
                 <div class="panel-header">
                     <span>Relationship Intelligence Graph</span>
-                    <div>
-                        <button onclick="expandNodes()" style="background:none; border: 1px solid #444; color: #888; padding: 2px 10px; cursor:pointer;">EXPAND</button>
-                    </div>
+                    <button onclick="expandNodes()" style="background:none; border: 1px solid #444; color: #888; padding: 2px 10px; cursor:pointer; font-size: 9px;">EXPAND NODE</button>
                 </div>
                 <div id="networkGraph"></div>
             </div>
 
             <div class="panel col-4">
                 <div class="panel-header">
-                    <span>Global Cyber Intel (Auto-BM)</span>
-                    <i class="fas fa-globe"></i>
+                    <span>Global Intel (Auto-BM)</span>
+                    <i class="fas fa-rss"></i>
                 </div>
                 <div id="news-engine" style="height: 380px; overflow-y: auto;">
                     </div>
@@ -262,18 +280,32 @@
 
         <footer style="display: flex; justify-content: space-between; padding: 15px 30px; background: #01040a; font-size: 11px; color: #444; border-top: 1px solid var(--glass-border);">
             <div>MEGATRON CYBER COMMAND © 2026 | MUHAMMAD ASRI HARUN</div>
-            <div>
-                <a href="api_docs.html" style="color:#555; text-decoration: none;">API_DOCS</a> | 
-                <a href="#" style="color:#555; text-decoration: none;">GOVERNANCE</a> |
-                <a href="#" onclick="window.location.href='crucix-lite.html'" style="color:var(--neon-blue); text-decoration: none;">OPEN_CRUCIX</a>
+            <div style="display: flex; gap: 20px;">
+                <a href="api_docs.html" style="color:#00eaff; text-decoration: none;">[ API_DOCS ]</a>
+                <a href="governance.html" style="color:#00eaff; text-decoration: none;">[ GOVERNANCE ]</a>
+                <a href="https://github.com/AsriHarun/megatron" target="_blank" style="color:#00eaff; text-decoration: none;">[ GITHUB ]</a>
+                <a href="#" onclick="window.location.href='crucix-lite.html'" style="color:var(--danger); text-decoration: none;">[ OPEN_CRUCIX ]</a>
             </div>
         </footer>
-        <a href="governance.html" style="color:#555; text-decoration: none;">GOVERNANCE</a>
-        
     </div>
 
     <script>
-        // --- 1. OSINT TRACKER LOGIC ---
+        // --- PDF EXPORT FUNCTION ---
+        function exportToPDF() {
+            const element = document.getElementById('printableArea');
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     'MEGATRON_INTEL_REPORT_2026.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, backgroundColor: '#02060f' },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+            
+            alert("Sistem sedang menjana Laporan PDF Intelligence...");
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // --- TRACKER LOGIC ---
         function runTracker() {
             const input = document.getElementById('subjectIn').value;
             const logs = document.getElementById('trackerLogs');
@@ -281,67 +313,5 @@
             logs.innerHTML = `> Mencari data subjek: ${input}...`;
             setTimeout(() => { logs.innerHTML += `<br>> Mengesan 'Digital Footprint' di pangkalan data terbuka...`; }, 1000);
             setTimeout(() => { logs.innerHTML += `<br>> 3 Akaun Media Sosial dikesan. Lokasi Metadata: Kuala Lumpur.`; }, 2500);
-            setTimeout(() => { logs.innerHTML += `<br>> [!] Rekod berkaitan ditemui dalam pengkalan data Interpol.`; }, 4000);
-        }
-
-        // --- 2. CORRUPTION RISK UPDATE ---
-        function updateCorruptionRisk() {
-            const val = Math.floor(Math.random() * (90 - 45) + 45);
-            document.getElementById('corruptionIdx').innerText = val + "%";
-            document.getElementById('corruptionFill').style.width = val + "%";
-            document.getElementById('corruptionIdx').style.color = val > 75 ? "#ff4444" : "#ff9800";
-        }
-
-        // --- 3. INTELLIGENCE GRAPH (VIS.JS) ---
-        let nodes = new vis.DataSet([
-            {id: 1, label: "SASARAN_UTAMA", color: "#ff4444", shape: "star", size: 30},
-            {id: 2, label: "Proksi_Vendor_A", color: "#ff9800"},
-            {id: 3, label: "Kontraktor_Utama", color: "#00eaff"},
-            {id: 4, label: "Offshore_Bank_Account", color: "#ff4444", shape: "box"}
-        ]);
-        let edges = new vis.DataSet([
-            {from: 1, to: 2, label: "Aliran Wang"},
-            {from: 2, to: 3, label: "Sub-kontrak"},
-            {from: 1, to: 4, label: "Pemindahan Rahsia"}
-        ]);
-        let network = new vis.Network(document.getElementById('networkGraph'), {nodes, edges}, {
-            nodes: { font: {color: "#fff", face: "monospace", size: 12}},
-            edges: { color: "rgba(0, 234, 255, 0.4)", arrows: 'to', font: {size: 8, color: '#aaa'} },
-            physics: { enabled: true, barnesHut: { gravitationalConstant: -4000 } }
-        });
-
-        function expandNodes() {
-            nodes.add({id: 5, label: "Syarikat_Shell_B", color: "#ff9800", shape: "diamond"});
-            edges.add({from: 2, to: 5, dashes: true});
-        }
-
-        // --- 4. NEWS TRANSLATION ENGINE ---
-        const newsSource = [
-            {t: "SPRM/AML", en: "Large-scale procurement fraud detected in infrastructure project.", bm: "Rasuah perolehan skala besar dikesan dalam projek infrastruktur."},
-            {t: "CYBER", en: "APT groups targeting government clouds with new Zero-day.", bm: "Kumpulan APT menyasarkan awan kerajaan dengan Zero-day baharu."},
-            {t: "PDRM/INTERPOL", en: "International drug syndicate using crypto mixers dismantled.", bm: "Sindiket dadah antarabangsa guna crypto mixer telah ditumpaskan."},
-            {t: "BLUE TEAM", en: "Multiple government portals show signs of SQL injection attempts.", bm: "Beberapa portal kerajaan menunjukkan tanda percubaan SQL injection."}
-        ];
-
-        function loadNews() {
-            const container = document.getElementById('news-engine');
-            newsSource.forEach(item => {
-                container.innerHTML += `
-                    <div class="news-item">
-                        <span class="news-tag">[${item.t}]</span><br>
-                        <strong>${item.bm}</strong><br>
-                        <small style="color:#555; font-style:italic;">Original: ${item.en}</small>
-                    </div>
-                `;
-            });
-        }
-
-        // Initialize Everything
-        window.onload = () => {
-            loadNews();
-            updateCorruptionRisk();
-            setInterval(updateCorruptionRisk, 6000);
-        };
-    </script>
-</body>
-</html>
+            setTimeout(() => { logs.innerHTML += `<br>> [!] Rekod berkaitan ditemui dalam pengkalan
+        
