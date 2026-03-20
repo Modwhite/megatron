@@ -7,7 +7,6 @@
     
     <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
@@ -162,7 +161,7 @@
             font-size: 13px;
         }
 
-        /* PDF Export Button Special Style */
+        /* PDF Export Button */
         .btn-pdf {
             background: var(--danger);
             color: white;
@@ -177,6 +176,19 @@
             gap: 8px;
         }
 
+        /* Lock Screen Overlay */
+        #lockScreen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 9999;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
         @media (max-width: 1024px) {
             .col-4, .col-8 { grid-column: span 12; }
             body { flex-direction: column-reverse; }
@@ -186,13 +198,20 @@
 </head>
 <body>
 
+    <div id="lockScreen">
+        <i class="fas fa-lock status-blink" style="font-size:80px; color:#ff4444; margin-bottom:20px;"></i>
+        <h2 style="color:#ff4444; letter-spacing:5px; font-family: monospace;">TERMINAL LOCKED</h2>
+        <p style="color:#555; font-size:12px;">Sesi tamat atau dikunci oleh ejen. Muat semula halaman untuk akses.</p>
+        <button onclick="location.reload()" style="background:transparent; border:1px solid #333; color:#333; padding:10px 20px; margin-top:20px; cursor:pointer; font-family: monospace;">UNLOCK SYSTEM</button>
+    </div>
+
     <nav class="sidebar">
         <div class="nav-item active" title="Command Center"><i class="fas fa-desktop"></i></div>
         <div class="nav-item" onclick="location.href='cases.html'" title="Kes Repository"><i class="fas fa-folder-open"></i></div>
         <div class="nav-item" onclick="location.href='digital_forensics.html'" title="Forensics"><i class="fas fa-search-dollar"></i></div>
         <div class="nav-item" onclick="location.href='financial_crime.html'" title="Financial/SPRM"><i class="fas fa-project-diagram"></i></div>
         <div class="nav-item" onclick="location.href='catur.html'" title="Tactical AI"><i class="fas fa-brain"></i></div>
-        <div class="nav-item" style="margin-top: auto; color: var(--danger);"><i class="fas fa-lock"></i></div>
+        <div class="nav-item" onclick="activateLock()" style="margin-top: auto; color: var(--danger);" title="Lock System"><i class="fas fa-lock"></i></div>
     </nav>
 
     <div class="main-container" id="printableArea">
@@ -283,14 +302,21 @@
             <div style="display: flex; gap: 20px;">
                 <a href="api_docs.html" style="color:#00eaff; text-decoration: none;">[ API_DOCS ]</a>
                 <a href="governance.html" style="color:#00eaff; text-decoration: none;">[ GOVERNANCE ]</a>
-                <a href="https://github.com/AsriHarun/megatron" target="_blank" style="color:#00eaff; text-decoration: none;">[ GITHUB ]</a>
-                <a href="#" onclick="window.location.href='crucix-lite.html'" style="color:var(--danger); text-decoration: none;">[ OPEN_CRUCIX ]</a>
+                <a href="cases.html" style="color:#00eaff; text-decoration: none;">[ CASES ]</a>
+                <a href="#" onclick="activateLock()" style="color:var(--danger); text-decoration: none;">[ LOCK_SYSTEM ]</a>
             </div>
         </footer>
     </div>
 
     <script>
-        // --- PDF EXPORT FUNCTION ---
+        // --- 1. LOCK SYSTEM ---
+        function activateLock() {
+            if(confirm("Adakah anda mahu mengunci Terminal Megatron?")) {
+                document.getElementById('lockScreen').style.display = 'flex';
+            }
+        }
+
+        // --- 2. PDF EXPORT ---
         function exportToPDF() {
             const element = document.getElementById('printableArea');
             const opt = {
@@ -300,12 +326,11 @@
                 html2canvas:  { scale: 2, backgroundColor: '#02060f' },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
             };
-            
             alert("Sistem sedang menjana Laporan PDF Intelligence...");
             html2pdf().set(opt).from(element).save();
         }
 
-        // --- TRACKER LOGIC ---
+        // --- 3. TRACKER LOGIC ---
         function runTracker() {
             const input = document.getElementById('subjectIn').value;
             const logs = document.getElementById('trackerLogs');
@@ -313,5 +338,70 @@
             logs.innerHTML = `> Mencari data subjek: ${input}...`;
             setTimeout(() => { logs.innerHTML += `<br>> Mengesan 'Digital Footprint' di pangkalan data terbuka...`; }, 1000);
             setTimeout(() => { logs.innerHTML += `<br>> 3 Akaun Media Sosial dikesan. Lokasi Metadata: Kuala Lumpur.`; }, 2500);
-            setTimeout(() => { logs.innerHTML += `<br>> [!] Rekod berkaitan ditemui dalam pengkalan
-        
+            setTimeout(() => { logs.innerHTML += `<br>> [!] Rekod berkaitan ditemui dalam pengkalan data Interpol.`; }, 4000);
+        }
+
+        // --- 4. CORRUPTION UPDATER ---
+        function updateCorruptionRisk() {
+            const val = Math.floor(Math.random() * (90 - 45) + 45);
+            const idx = document.getElementById('corruptionIdx');
+            if(idx) {
+                idx.innerText = val + "%";
+                document.getElementById('corruptionFill').style.width = val + "%";
+                idx.style.color = val > 75 ? "#ff4444" : "#ff9800";
+            }
+        }
+
+        // --- 5. NETWORK GRAPH ---
+        let nodes = new vis.DataSet([
+            {id: 1, label: "SASARAN_UTAMA", color: "#ff4444", shape: "star", size: 30},
+            {id: 2, label: "Proksi_Vendor_A", color: "#ff9800"},
+            {id: 3, label: "Kontraktor_Utama", color: "#00eaff"},
+            {id: 4, label: "Offshore_Bank_Account", color: "#ff4444", shape: "box"}
+        ]);
+        let edges = new vis.DataSet([
+            {from: 1, to: 2, label: "Aliran Wang"},
+            {from: 2, to: 3, label: "Sub-kontrak"},
+            {from: 1, to: 4, label: "Pemindahan Rahsia"}
+        ]);
+        let network = new vis.Network(document.getElementById('networkGraph'), {nodes, edges}, {
+            nodes: { font: {color: "#fff", face: "monospace", size: 12}},
+            edges: { color: "rgba(0, 234, 255, 0.4)", arrows: 'to', font: {size: 8, color: '#aaa'} },
+            physics: { enabled: true, barnesHut: { gravitationalConstant: -4000 } }
+        });
+
+        function expandNodes() {
+            nodes.add({id: 5, label: "Syarikat_Shell_B", color: "#ff9800", shape: "diamond"});
+            edges.add({from: 2, to: 5, dashes: true});
+        }
+
+        // --- 6. NEWS FEED ---
+        const newsSource = [
+            {t: "SPRM/AML", en: "Large-scale procurement fraud detected in infrastructure project.", bm: "Rasuah perolehan skala besar dikesan dalam projek infrastruktur."},
+            {t: "CYBER", en: "APT groups targeting government clouds with new Zero-day.", bm: "Kumpulan APT menyasarkan awan kerajaan dengan Zero-day baharu."},
+            {t: "PDRM/INTERPOL", en: "International drug syndicate using crypto mixers dismantled.", bm: "Sindiket dadah antarabangsa guna crypto mixer telah ditumpaskan."},
+            {t: "BLUE TEAM", en: "Multiple government portals show signs of SQL injection attempts.", bm: "Beberapa portal kerajaan menunjukkan tanda percubaan SQL injection."}
+        ];
+
+        function loadNews() {
+            const container = document.getElementById('news-engine');
+            if(!container) return;
+            newsSource.forEach(item => {
+                container.innerHTML += `
+                    <div class="news-item">
+                        <span class="news-tag">[${item.t}]</span><br>
+                        <strong>${item.bm}</strong><br>
+                        <small style="color:#555; font-style:italic;">Original: ${item.en}</small>
+                    </div>
+                `;
+            });
+        }
+
+        window.onload = () => {
+            loadNews();
+            updateCorruptionRisk();
+            setInterval(updateCorruptionRisk, 6000);
+        };
+    </script>
+</body>
+</html>
