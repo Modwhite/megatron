@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CASE MANAGEMENT | MEGATRON Intelligence</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --neon-blue: #00eaff;
+            --danger: #ff4444;
+            --bg-dark: #02060f;
+            --panel-bg: #0d1a2b;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            border-bottom: 1px solid var(--neon-blue);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .case-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        /* Dossier Style Card */
+        .case-card {
+            background: var(--panel-bg);
+            border: 1px solid rgba(0, 234, 255, 0.1);
+            padding: 20px;
+            border-radius: 4px;
+            position: relative;
+            transition: 0.3s;
+        }
+
+        .case-card:hover { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 234, 255, 0.1); }
+
+        .case-tag {
+            position: absolute;
+            top: 15px; right: 15px;
+            padding: 4px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 3px;
+        }
+
+        .tag-sprm { background: #ff9800; color: #000; } /* Orange untuk Rasuah */
+        .tag-pdrm { background: #1e90ff; color: #fff; } /* Blue untuk Jenayah */
+
+        .case-id { font-family: 'Courier New'; color: var(--neon-blue); font-size: 14px; margin-bottom: 10px; }
+        .case-title { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+        
+        .evidence-list { font-size: 12px; color: #8892b0; list-style: none; padding: 0; }
+        .evidence-list li { margin-bottom: 5px; }
+        .evidence-list i { margin-right: 8px; color: var(--neon-blue); }
+
+        .status-badge {
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 11px;
+            padding: 2px 10px;
+            border: 1px solid #333;
+            border-radius: 10px;
+        }
+
+        .btn-add {
+            background: var(--neon-blue);
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-back { color: var(--neon-blue); text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <h1 style="margin:0; letter-spacing: 3px;">CENTRAL CASE REPOSITORY</h1>
+            <span style="color:#555; font-size: 12px;">Sistem Pengurusan Kes Bersepadu Megatron</span>
+        </div>
+        <button class="btn-add" onclick="addNewCase()">+ CIPTA KES BARU</button>
+    </header>
+
+    <div class="case-grid" id="caseGrid">
+        
+        <div class="case-card">
+            <span class="case-tag tag-sprm">SPRM / AML</span>
+            <div class="case-id">CASE_ID: MY-ACC-2026-001</div>
+            <div class="case-title">Siasatan Ketirisan Projek Infrastruktur Zon Utara</div>
+            <ul class="evidence-list">
+                <li><i class="fas fa-link"></i> 3 Syarikat Shell Dikesan (Proxy)</li>
+                <li><i class="fas fa-wallet"></i> Aliran Tunai: RM 14.2 Juta</li>
+                <li><i class="fas fa-file-contract"></i> Kontrak Perolehan Tidak Sah</li>
+            </ul>
+            <div class="status-badge" style="color: #39ff14; border-color: #39ff14;">SEDANG DIANALISIS</div>
+        </div>
+
+        <div class="case-card">
+            <span class="case-tag tag-pdrm">PDRM / INTERPOL</span>
+            <div class="case-id">CASE_ID: MY-CYB-2026-089</div>
+            <div class="case-title">Sindiket Phishing Antarabangsa "Operation Blue-Web"</div>
+            <ul class="evidence-list">
+                <li><i class="fas fa-network-wired"></i> 14 IP Address (Log Serangan)</li>
+                <li><i class="fas fa-user-tag"></i> Jejak Digital: Username 'Crucix_99'</li>
+                <li><i class="fas fa-map-marker-alt"></i> Lokasi Metadata: Cyberjaya / Kuala Lumpur</li>
+            </ul>
+            <div class="status-badge" style="color: #ff4444; border-color: #ff4444;">DIKEHENDAKI (RED NOTICE)</div>
+        </div>
+
+    </div>
+
+    <div style="margin-top: 50px; text-align: center;">
+        <a href="index.html" class="btn-back"><i class="fas fa-chevron-left"></i> Kembali ke Dashboard Utama</a>
+    </div>
+
+    <script>
+        function addNewCase() {
+            const grid = document.getElementById('caseGrid');
+            const newCase = `
+                <div class="case-card" style="border-style: dashed;">
+                    <div class="case-id" style="color:#555">CASE_ID: NEW_DRAFT</div>
+                    <div class="case-title" style="color:#555">Menunggu Input Data...</div>
+                    <p style="font-size:12px; color:#444">Sila masukkan butiran kes melalui API atau Borang Manual.</p>
+                    <div class="status-badge">DRAFT</div>
+                </div>
+            `;
+            grid.innerHTML = newCase + grid.innerHTML;
+        }
+    </script>
+
+</body>
+</html>
