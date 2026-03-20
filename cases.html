@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MEGATRON | Case Management System</title>
+    <title>MEGATRON | Case Management & Analytics</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --neon-blue: #00eaff;
+            --neon-orange: #ff9800;
             --danger: #ff4444;
             --success: #39ff14;
             --bg-dark: #02060f;
@@ -18,13 +19,14 @@
         body {
             background: var(--bg-dark);
             color: var(--neon-blue);
-            font-family: 'Segoe UI', monospace;
+            font-family: 'Segoe UI', 'Courier New', monospace;
             margin: 0;
             display: flex;
             height: 100vh;
+            overflow: hidden;
         }
 
-        /* Sidebar similar to Index */
+        /* Sidebar Navigation */
         .sidebar {
             width: 75px;
             background: #01040a;
@@ -33,6 +35,7 @@
             flex-direction: column;
             align-items: center;
             padding-top: 25px;
+            z-index: 100;
         }
 
         .nav-item {
@@ -46,18 +49,33 @@
             box-shadow: 0 0 15px rgba(0, 234, 255, 0.3);
         }
 
+        /* Main Content */
         .main-content {
-            flex: 1; padding: 30px; overflow-y: auto;
+            flex: 1; padding: 25px; overflow-y: auto;
             background: radial-gradient(circle at top, #0a192f 0%, #02060f 100%);
         }
 
         header {
             display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 30px; border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 20px;
+            margin-bottom: 20px; border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
         }
 
-        .case-grid {
+        /* Dashboard Stats */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border);
+            padding: 15px; border-radius: 6px; text-align: center;
+        }
+
+        .stat-card h4 { margin: 0; font-size: 10px; color: #888; text-transform: uppercase; }
+        .stat-card div { font-size: 20px; font-weight: bold; margin-top: 5px; }
+
+        /* Grid Layout */
+        .case-container {
             display: grid; grid-template-columns: 2fr 1fr; gap: 20px;
         }
 
@@ -66,31 +84,46 @@
             border-radius: 8px; padding: 20px; backdrop-filter: blur(10px);
         }
 
-        table {
-            width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px;
-        }
+        h3 { font-size: 16px; margin-top: 0; border-bottom: 1px solid #16253d; padding-bottom: 10px; display: flex; align-items: center; gap: 10px; }
 
-        th { text-align: left; padding: 12px; border-bottom: 1px solid #222; color: #888; text-transform: uppercase; }
-        td { padding: 12px; border-bottom: 1px solid #111; }
+        /* Table */
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { text-align: left; padding: 12px; color: #555; border-bottom: 1px solid #16253d; }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
 
-        .status-badge {
-            padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold;
-        }
-        .status-investigation { background: rgba(255, 152, 0, 0.2); color: #ff9800; }
-        .status-warrant { background: rgba(255, 68, 68, 0.2); color: #ff4444; }
-        .status-closed { background: rgba(57, 255, 20, 0.2); color: #39ff14; }
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 9px; font-weight: bold; }
+        .bg-investigation { background: rgba(255, 152, 0, 0.2); color: var(--neon-orange); }
+        .bg-warrant { background: rgba(255, 68, 68, 0.2); color: var(--danger); }
+        .bg-closed { background: rgba(57, 255, 20, 0.2); color: var(--success); }
 
+        /* Evidence Vault */
         .evidence-item {
-            display: flex; align-items: center; gap: 15px;
+            display: flex; align-items: center; gap: 12px;
             padding: 10px; background: rgba(0,0,0,0.3); border-radius: 5px; margin-bottom: 10px;
-            border: 1px solid transparent; transition: 0.3s; cursor: pointer;
+            border: 1px solid transparent; transition: 0.2s; cursor: pointer;
         }
-        .evidence-item:hover { border-color: var(--neon-blue); background: rgba(0, 234, 255, 0.05); }
+        .evidence-item:hover { border-color: var(--neon-blue); }
 
-        .btn-back {
-            color: var(--neon-blue); text-decoration: none; font-size: 12px;
-            display: flex; align-items: center; gap: 5px; margin-bottom: 20px;
+        /* SPRM Integration Cross-Check */
+        .sprm-box {
+            background: linear-gradient(45deg, #0d1a2b, #1a1005);
+            border: 1px solid var(--neon-orange);
+            padding: 15px; border-radius: 6px; margin-top: 20px;
         }
+
+        /* Search Bar */
+        .search-area { margin-bottom: 20px; }
+        .search-input {
+            width: 100%; padding: 12px; background: #000; border: 1px solid var(--neon-blue);
+            color: var(--neon-blue); font-family: monospace; border-radius: 4px;
+        }
+
+        .btn-back { color: #555; text-decoration: none; font-size: 12px; margin-bottom: 15px; display: inline-block; }
+        .btn-back:hover { color: var(--neon-blue); }
+
+        .blink { animation: blinker 1.5s linear infinite; }
+        @keyframes blinker { 50% { opacity: 0; } }
+
     </style>
 </head>
 <body>
@@ -98,101 +131,124 @@
     <nav class="sidebar">
         <div class="nav-item" onclick="location.href='index.html'"><i class="fas fa-desktop"></i></div>
         <div class="nav-item active"><i class="fas fa-folder-open"></i></div>
-        <div class="nav-item"><i class="fas fa-search-dollar"></i></div>
-        <div class="nav-item"><i class="fas fa-project-diagram"></i></div>
-        <div style="margin-top: auto; color: var(--danger);" class="nav-item"><i class="fas fa-lock"></i></div>
+        <div class="nav-item" onclick="location.href='digital_forensics.html'"><i class="fas fa-microscope"></i></div>
+        <div class="nav-item" onclick="location.href='financial_crime.html'"><i class="fas fa-file-invoice-dollar"></i></div>
+        <div class="nav-item" style="margin-top: auto; color: var(--danger);" onclick="alert('Terminal Locked')"><i class="fas fa-lock"></i></div>
     </nav>
 
     <div class="main-content">
-        <a href="index.html" class="btn-back"><i class="fas fa-arrow-left"></i> KEMBALI KE COMMAND CENTER</a>
+        <a href="index.html" class="btn-back"><i class="fas fa-chevron-left"></i> Kembali ke Dashboard</a>
         
         <header>
             <div>
-                <h1 style="margin:0; letter-spacing: 2px;">CASE REPOSITORY</h1>
-                <span style="font-size: 12px; color: #555;">Sistem Pengurusan Kes Bersepadu (SPKB) v4.0</span>
+                <h1 style="margin:0; letter-spacing: 2px; font-size: 24px;">CASE MANAGEMENT SYSTEM</h1>
+                <span style="font-size: 11px; color: #555;">INTEGRATED WITH SPRM CONVICTION DATABASE v2026</span>
             </div>
-            <div style="text-align: right;">
-                <button style="background: var(--neon-blue); border:none; padding: 10px 20px; border-radius: 4px; font-weight: bold; cursor: pointer;">
-                    + DAFTAR KES BARU
-                </button>
-            </div>
+            <button style="background: var(--neon-blue); border:none; padding: 10px 20px; font-weight: bold; border-radius: 4px; cursor: pointer; color: #000;">
+                + DAFTAR KES BARU
+            </button>
         </header>
 
-        <div class="case-grid">
+        <div class="stats-row">
+            <div class="stat-card"><h4>Kes Aktif</h4><div>462</div></div>
+            <div class="stat-card"><h4>Sabitan Tahun Ini</h4><div style="color:var(--neon-orange)">128</div></div>
+            <div class="stat-card"><h4>Dana Dirampas</h4><div style="color:var(--success)">RM 14.2M</div></div>
+            <div class="stat-card"><h4>Risk Index</h4><div class="blink" style="color:var(--danger)">CRITICAL</div></div>
+        </div>
+
+        <div class="search-area">
+            <input type="text" id="caseSearch" class="search-input" onkeyup="filterCases()" placeholder="🔍 Cari Kes atau Nama Pesalah (Cross-check Database SPRM)...">
+        </div>
+
+        <div class="case-container">
             <div class="panel">
-                <h3 style="margin-top:0;"><i class="fas fa-list"></i> Senarai Kes Aktif</h3>
+                <h3><i class="fas fa-clipboard-list"></i> Central Case Registry</h3>
                 <table>
                     <thead>
                         <tr>
-                            <th>Kod Kes</th>
-                            <th>Subjek / Sasaran</th>
-                            <th>Kategori</th>
-                            <th>Status</th>
-                            <th>Pegawai</th>
+                            <th>ID KES</th>
+                            <th>SASARAN / ENTITI</th>
+                            <th>KATEGORI</th>
+                            <th>STATUS</th>
+                            <th>PEGAWAI</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
+                    <tbody id="caseTable">
+                        <tr class="case-row">
                             <td>#SPRM/2026/089</td>
-                            <td>Dato' Seri X (Proxy Network)</td>
-                            <td>Pengubahan Wang Haram</td>
-                            <td><span class="status-badge status-investigation">DALAM SIASATAN</span></td>
+                            <td>Dato' Abd Rasad (690130-12-XXXX)</td>
+                            <td>Salah Guna Kuasa</td>
+                            <td><span class="badge bg-investigation">SIASATAN</span></td>
                             <td>Insp. Asri</td>
                         </tr>
-                        <tr>
-                            <td>#SPRM/2026/102</td>
-                            <td>Sindiket Kontrak Pasir</td>
-                            <td>Rasuah Perolehan</td>
-                            <td><span class="status-badge status-warrant">WARAN AKTIF</span></td>
-                            <td>Insp. Asri</td>
-                        </tr>
-                        <tr>
-                            <td>#SPRM/2026/045</td>
-                            <td>Syarikat Shell Global Tech</td>
-                            <td>Ketirisan Dana</td>
-                            <td><span class="status-badge status-closed">DIADILI</span></td>
+                        <tr class="case-row">
+                            <td>#PDRM/2026/112</td>
+                            <td>Syndicate 'Blue-Web'</td>
+                            <td>Cyber Fraud</td>
+                            <td><span class="badge bg-warrant">WARAN AKTIF</span></td>
                             <td>Unit 09</td>
+                        </tr>
+                        <tr class="case-row">
+                            <td>#SPRM/2026/045</td>
+                            <td>Syarikat Shell Global</td>
+                            <td>Money Laundering</td>
+                            <td><span class="badge bg-closed">DIADILI</span></td>
+                            <td>Insp. Asri</td>
                         </tr>
                     </tbody>
                 </table>
-            </div>
 
-            <div class="panel">
-                <h3 style="margin-top:0;"><i class="fas fa-vault"></i> Evidence Vault</h3>
-                <div class="evidence-item">
-                    <i class="fas fa-file-pdf" style="font-size: 24px; color: #ff4444;"></i>
-                    <div>
-                        <div style="font-size: 13px;">Penyata_Bank_Syarikat_A.pdf</div>
-                        <div style="font-size: 10px; color: #555;">Diupload: 2 Jam Lepas | 4.2MB</div>
-                    </div>
-                </div>
-                <div class="evidence-item">
-                    <i class="fas fa-file-image" style="font-size: 24px; color: #39ff14;"></i>
-                    <div>
-                        <div style="font-size: 13px;">Bukti_Serahan_Tunai.jpg</div>
-                        <div style="font-size: 10px; color: #555;">Diupload: Semalam | 1.8MB</div>
-                    </div>
-                </div>
-                <div class="evidence-item">
-                    <i class="fas fa-file-invoice-dollar" style="font-size: 24px; color: var(--neon-blue);"></i>
-                    <div>
-                        <div style="font-size: 13px;">Resit_Crypto_Mixer.log</div>
-                        <div style="font-size: 10px; color: #555;">Diupload: 15 Mac 2026 | 155KB</div>
+                <div class="sprm-box">
+                    <h4 style="margin:0; font-size: 12px; color: var(--neon-orange);"><i class="fas fa-database"></i> SPRM CROSS-CHECK ENGINE</h4>
+                    <div style="display: flex; gap: 15px; margin-top: 10px; align-items: center;">
+                        <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" width="50" style="filter: grayscale(1) invert(1);">
+                        <div style="font-size: 12px;">
+                            <span style="color: var(--danger); font-weight: bold;">[!] PADANAN DIJUMPAI:</span><br>
+                            Subjek 'Abd Rasad' dikesan dalam Pangkalan Data Pesalah Rasuah (Sabah, 2026).<br>
+                            Sila rujuk <b>Kes #BKI-61R-33</b> untuk rincian pertuduhan.
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="panel" style="margin-top: 20px;">
-            <h3 style="margin-top:0; font-size: 14px; color: #555;">AUDIT TRAIL LOGS</h3>
-            <div style="font-family: monospace; font-size: 11px; color: #333;">
-                [10:14:02] LOGIN: Insp. Asri mengakses Kes #SPRM/2026/089<br>
-                [09:45:12] SYSTEM: Backup pangkalan data berjaya disalin ke NODE_MY_KL_09<br>
-                [08:00:00] SECURITY: Terminal Megatron diaktifkan di lokasi Kuala Lumpur.
+            <div>
+                <div class="panel">
+                    <h3><i class="fas fa-vault"></i> Digital Evidence Vault</h3>
+                    <div class="evidence-item">
+                        <i class="fas fa-file-pdf" style="color: #ff4444; font-size: 20px;"></i>
+                        <div><div style="font-size: 12px;">Penyata_AmBank_7742.pdf</div><div style="font-size: 9px; color: #555;">4.2MB | SPRM Archive</div></div>
+                    </div>
+                    <div class="evidence-item">
+                        <i class="fas fa-file-image" style="color: #39ff14; font-size: 20px;"></i>
+                        <div><div style="font-size: 12px;">Bukti_Serahan_Tunai.jpg</div><div style="font-size: 9px; color: #555;">1.8MB | Physical Evidence</div></div>
+                    </div>
+                    <div class="evidence-item">
+                        <i class="fas fa-file-invoice-dollar" style="color: var(--neon-blue); font-size: 20px;"></i>
+                        <div><div style="font-size: 12px;">Crypto_Mixer_Log.txt</div><div style="font-size: 9px; color: #555;">15KB | Blockchain Trace</div></div>
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-top: 20px;">
+                    <h3><i class="fas fa-history"></i> Audit Trail</h3>
+                    <div style="font-family: monospace; font-size: 10px; color: #444;">
+                        [09:30:05] ACCESS: Insp. Asri memuat turun bukti PDF.<br>
+                        [09:28:12] CROSS-CHECK: Padanan data SPRM dikesan.<br>
+                        [08:00:00] SYSTEM: Terminal Megatron Online (Node_MY).
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <script>
+        function filterCases() {
+            let input = document.getElementById('caseSearch').value.toUpperCase();
+            let rows = document.getElementsByClassName('case-row');
+            for (let i = 0; i < rows.length; i++) {
+                let text = rows[i].innerText.toUpperCase();
+                rows[i].style.display = text.indexOf(input) > -1 ? "" : "none";
+            }
+        }
+    </script>
 </body>
 </html>
-
